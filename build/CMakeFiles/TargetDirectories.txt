@@ -1,3 +1,0 @@
-/home/cole/learn_opengl/build/CMakeFiles/OpenGLProject.dir
-/home/cole/learn_opengl/build/CMakeFiles/edit_cache.dir
-/home/cole/learn_opengl/build/CMakeFiles/rebuild_cache.dir

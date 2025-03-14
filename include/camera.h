@@ -17,14 +17,15 @@ class Camera {
         glm::vec3 Orientation = glm::vec3(0.0f, 0.0f, -1.0f);
         glm::vec3 Up = glm::vec3(0.0f, 1.0f, 0.0f);
 
-        bool firstClick = true;
+        bool focused = false;
 
         int width;
         int height;
 
         const float defaultSpeed = 0.05f;
+        const float fastSpeed = 0.15f;
         float currSpeed = defaultSpeed;
-        float sensitivity = 1.0f;
+        float sensitivity = 75.0f;
 
         Camera(int width, int height, glm::vec3 position);
 

@@ -15,8 +15,8 @@
 #include "EBO.h"
 #include "camera.h"
 
-unsigned int windowWidth = 800;
-unsigned int windowHeight = 800;
+unsigned int windowWidth = 1280;
+unsigned int windowHeight = 720;
 
 void processInput(GLFWwindow*);
 
@@ -110,8 +110,8 @@ int main() {
 
 	glfwDestroyWindow(window);
 	glfwTerminate();
-    
-	return 0;
+
+	std::cout << "\nThanks For Playing!\n:]\n";
 }
 
 void processInput(GLFWwindow *window) {

@@ -31,32 +31,28 @@ void Camera::Inputs(GLFWwindow* window) {
         Position += currSpeed * glm::normalize(glm::cross(Orientation, Up));
     }
     if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-        Position += currSpeed * Up;
-    }
-    if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
-        Position += currSpeed * -Up;
+        Position += (defaultSpeed / 2.0f) * Up;
     }
     if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
-        currSpeed = 0.2f;
+        Position += (defaultSpeed / 2.0f) * -Up;
     }
-    else if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE) {
+    if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
+        currSpeed = fastSpeed;
+    }
+    else if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_RELEASE) {
         currSpeed = defaultSpeed;
     }
 
     // Mouse Handler
     if (glfwGetWindowAttrib(window, GLFW_FOCUSED) == GLFW_TRUE) {
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-
-        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        }
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
         double mouseX, mouseY;
         glfwGetCursorPos(window, &mouseX, &mouseY);
 
-        if (firstClick) {
+        if (!focused) {
             glfwSetCursorPos(window, width / 2, height / 2);
-            firstClick = false;
+            focused = true;
         }
 
         float rotX = sensitivity * (float)(mouseY - height / 2) / height;
@@ -73,5 +69,6 @@ void Camera::Inputs(GLFWwindow* window) {
         glfwSetCursorPos(window, width / 2, height / 2);
     } else {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        focused = false;
     }
 }

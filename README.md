@@ -1,6 +1,6 @@
 # OpenGL Project
 
-This project is a basic OpenGL game.
+This project is a basic game using OpenGL and C++.
 
 ## Requirements
 
@@ -9,27 +9,28 @@ This project is a basic OpenGL game.
 Before running the project, you need to install the following libraries:
 
 1. **GLFW3**
+
    - GLFW is used for creating windows with OpenGL contexts and handling input events like keyboard and mouse.
    - Install via package manager (Linux):
      ```bash
      sudo apt-get install libglfw3 libglfw3-dev
      ```
-
 2. **GLEW**
+
    - GLEW is used for managing OpenGL extensions.
    - Install via package manager (Linux):
      ```bash
      sudo apt-get install libglew-dev
      ```
-
 3. **OpenGL**
+
    - OpenGL is the graphics rendering API used in this project.
    - Install via package manager (Linux):
      ```bash
      sudo apt-get install libopengl-dev
      ```
-
 4. **Pkg-config**
+
    - Pkg-config helps manage library compile and link flags.
    - Install via package manager (Linux):
      ```bash
@@ -39,12 +40,12 @@ Before running the project, you need to install the following libraries:
 ### Additional Tools
 
 - **CMake** (for building the project)
-   - Install via package manager (Linux):
-     ```bash
-     sudo apt-get install cmake
-     ```
 
-- **Optional**: On Windows, you may need to use MSYS2 or WSL to provide the Unix-like environment to use `pkg-config` and other tools. 
+  - Install via package manager (Linux):
+    ```bash
+    sudo apt-get install cmake
+    ```
+- **Optional**: On Windows, you may need to use MSYS2 or WSL to provide the Unix-like environment to use `pkg-config` and other tools.
 
 ## Setup and Build
 
@@ -79,6 +80,7 @@ Available flags:
 - `-r` : Run the program after building it.
 
 Alernatively, run the program using:
+
 ```bash
 cd ./build
 ./OpenGLProject

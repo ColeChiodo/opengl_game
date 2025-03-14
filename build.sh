@@ -1,25 +1,29 @@
 #!/bin/bash
 
-# Define the program name. Must be the same as CMakeList.txt
+# Define the program name. Must be the same as CMakeLists.txt
 PROGRAM_NAME="OpenGLProject"
 
-# Flag for cleaning the build directory
+# Flags
 CLEAN_BUILD=false
+RUN_PROGRAM=false
 
 # Parse the command-line arguments for flags
-while getopts "r" opt; do
+while getopts "dr" opt; do
   case ${opt} in
-    r)
+    d)
       CLEAN_BUILD=true
       ;;
+    r)
+      RUN_PROGRAM=true
+      ;;
     *)
-      echo "Usage: $0 [-r]"
+      echo "Usage: $0 [-d (clean build)] [-r (run the program after build)]"
       exit 1
       ;;
   esac
 done
 
-# If the -r flag is provided, clean the build directory
+# If the -d flag is provided, clean the build directory
 if [ "$CLEAN_BUILD" = true ]; then
     if [ -d "build" ]; then
         echo "Cleaning the build directory..."
@@ -46,6 +50,10 @@ cmake ..
 echo "Running make ..."
 make
 
-# Run the program
-echo "Running the program..."
-./$PROGRAM_NAME
+# Run the program if the -r flag is provided
+if [ "$RUN_PROGRAM" = true ]; then
+    echo "Running the program..."
+    ./$PROGRAM_NAME
+else
+    echo "Build complete. Use -r flag to run the program."
+fi

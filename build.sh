@@ -62,22 +62,29 @@ if [ "$PLATFORM" = "linux" ]; then
     cmake ..
     BUILD_CMD="make"
 elif [ "$PLATFORM" = "windows" ]; then
-    cmake -G "Visual Studio 16 2019" ..
-    BUILD_CMD=""
-
-    echo "Visual Studio solution generated. Open the .sln file with Visual Studio to build the project."
+    cmake -G "MinGW Makefiles" ..
+    BUILD_CMD="mingw32-make"
 fi
 
-# Run the build command (using Visual Studio on Windows or make on Linux)
-if [ "$PLATFORM" = "linux" ]; then
-    echo "Running make ..."
-    $BUILD_CMD
+# Run the build command
+echo "Building the project..."
+$BUILD_CMD
+
+# Check if build was successful
+if [ $? -ne 0 ]; then
+    echo "Build failed!"
+    exit 1
 fi
 
 # Run the program if the -r flag is provided
-if [ "$RUN_PROGRAM" = true ] && [ "$PLATFORM" = "linux" ]; then
-    echo "Running the program..."
-    ./$PROGRAM_NAME
+if [ "$RUN_PROGRAM" = true ]; then
+    if [ "$PLATFORM" = "linux" ]; then
+        echo "Running the program..."
+        ./$PROGRAM_NAME
+    elif [ "$PLATFORM" = "windows" ]; then
+        echo "Running the program..."
+        ./$PROGRAM_NAME.exe
+    fi
 else
     echo "Build complete. Use -r flag to run the program."
 fi

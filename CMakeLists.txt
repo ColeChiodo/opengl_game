@@ -26,6 +26,9 @@ list(APPEND SOURCES src/stb_image.cpp)
 # Create the executable
 add_executable(OpenGLProject ${SOURCES})
 
+# Add Definition for Enabling GLM Experiemental Mode
+add_definitions(-DGLM_ENABLE_EXPERIMENTAL)
+
 # Link the libraries
 target_link_libraries(OpenGLProject ${GLFW3_LIBRARIES} ${GLEW_LIBRARIES} OpenGL::GL)
 

@@ -1,5 +1,7 @@
 #include "meshClass.h"
 
+const char* gameTitle = "Cole's Game";
+
 unsigned int windowWidth = 1280;
 unsigned int windowHeight = 720;
 
@@ -72,7 +74,7 @@ int main() {
         return -1;
     }
 
-	GLFWwindow* window = glfwCreateWindow(windowWidth, windowHeight, "My Game", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(windowWidth, windowHeight, gameTitle, NULL, NULL);
 	if (window == NULL) {
 		std::cerr << "Failed to create GLFW window" << std::endl;
 		glfwTerminate();
@@ -151,8 +153,28 @@ int main() {
 
 	Camera camera(windowWidth, windowHeight, glm::vec3(0.0f, 0.0f, 2.0f));
 
+    // For FPS Counter
+    double prevTime = 0.0;
+	double currTime = 0.0;
+	double timeDiff;
+	unsigned int counter = 0;
+
     // Main Loop
 	while (!glfwWindowShouldClose(window)) {
+        currTime = glfwGetTime();
+		timeDiff = currTime - prevTime;
+		counter++;
+
+		if (timeDiff >= 1.0 / 10.0) {
+			std::string FPS = std::to_string((1.0 / timeDiff) * counter);
+			std::string ms = std::to_string((timeDiff / counter) * 1000);
+			std::string newTitle = std::string(gameTitle) + " - " + FPS + "FPS / " + ms + "ms";
+			glfwSetWindowTitle(window, newTitle.c_str());
+
+			prevTime = currTime;
+			counter = 0;
+		}
+
         // Clear Screen
 		glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

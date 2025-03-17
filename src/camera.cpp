@@ -45,22 +45,22 @@ void Camera::Inputs(GLFWwindow* window) {
     } else if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_RELEASE) {
         currSpeed = defaultSpeed;
     }
-    bool freeMouseMovement = false;
+    bool mouseLock = true;
     if (glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS) {
-        freeMouseMovement = true;
+        mouseLock = false;
     }
 
     // Mouse Handler
-    if (!freeMouseMovement) {
+    if (glfwGetWindowAttrib(window, GLFW_FOCUSED) == GLFW_TRUE && mouseLock == GLFW_TRUE) {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+        if (firstFocus) {
+			glfwSetCursorPos(window, (width / 2), (height / 2));
+			firstFocus = false;
+		}
 
         double mouseX, mouseY;
         glfwGetCursorPos(window, &mouseX, &mouseY);
-
-        if (!focused) {
-            glfwSetCursorPos(window, width / 2, height / 2);
-            focused = true;
-        }
 
         float rotX = sensitivity * (float)(mouseY - height / 2) / height;
         float rotY = sensitivity * (float)(mouseX - width / 2) / width;
@@ -76,6 +76,6 @@ void Camera::Inputs(GLFWwindow* window) {
         glfwSetCursorPos(window, width / 2, height / 2);
     } else {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-        focused = false;
+        firstFocus = true;
     }
 }

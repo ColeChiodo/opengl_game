@@ -1,51 +1,57 @@
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <stb/stb_image.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
-#include <iostream>
-#include <cmath>
-
-#include "shaderClass.h"
-#include "textureClass.h"
-#include "VAO.h"
-#include "VBO.h"
-#include "EBO.h"
-#include "camera.h"
+#include "meshClass.h"
 
 unsigned int windowWidth = 1280;
 unsigned int windowHeight = 720;
 
 void windowInputs(GLFWwindow*);
 
-float planeVertices[] = {
-    //     COORDINATES     /        COLORS          /    TexCoord   /        NORMALS       //
-	-1.0f, 0.0f,  1.0f,		0.0f, 0.0f, 0.0f,		0.0f, 0.0f,		0.0f, 1.0f, 0.0f,
-	-1.0f, 0.0f, -1.0f,		0.0f, 0.0f, 0.0f,		0.0f, 1.0f,		0.0f, 1.0f, 0.0f,
-	 1.0f, 0.0f, -1.0f,		0.0f, 0.0f, 0.0f,		1.0f, 1.0f,		0.0f, 1.0f, 0.0f,
-	 1.0f, 0.0f,  1.0f,		0.0f, 0.0f, 0.0f,		1.0f, 0.0f,		0.0f, 1.0f, 0.0f
-
+Vertex planeVertices[] = {
+  //             COORDINATES             /            COLORS          /           NORMALS          /  TEXTURE COORDINATES  //
+    Vertex{glm::vec3(-1.0f, 0.0f,  1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(0.0f, 0.0f)},
+	Vertex{glm::vec3(-1.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
+	Vertex{glm::vec3( 1.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 1.0f)},
+	Vertex{glm::vec3( 1.0f, 0.0f,  1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)}
 };
 
-unsigned int planeIndices[] = {
+GLuint planeIndices[] = {
     0, 1, 2,
 	0, 2, 3,
 };
 
-float lightVertices[] = {
-    -0.1f, -0.1f,  0.1f,
-     0.1f, -0.1f,  0.1f,
-     0.1f,  0.1f,  0.1f,
-    -0.1f,  0.1f,  0.1f,
-    -0.1f, -0.1f, -0.1f,
-     0.1f, -0.1f, -0.1f,
-     0.1f,  0.1f, -0.1f,
-    -0.1f,  0.1f, -0.1f,
+Vertex turtleVertices[] = {
+  //             COORDINATES             /            COLORS          /           NORMALS          /  TEXTURE COORDINATES  //
+    Vertex{glm::vec3(-0.2f, -0.2f,  0.2f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 0.0f)},
+    Vertex{glm::vec3( 0.2f, -0.2f,  0.2f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 0.0f)},
+    Vertex{glm::vec3( 0.2f,  0.2f,  0.2f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 1.0f)},
+    Vertex{glm::vec3(-0.2f,  0.2f,  0.2f), glm::vec3(1.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
+    Vertex{glm::vec3(-0.2f, -0.2f, -0.2f), glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec2(1.0f, 0.0f)},
+    Vertex{glm::vec3( 0.2f, -0.2f, -0.2f), glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec2(0.0f, 0.0f)},
+    Vertex{glm::vec3( 0.2f,  0.2f, -0.2f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec2(0.0f, 1.0f)},
+    Vertex{glm::vec3(-0.2f,  0.2f, -0.2f), glm::vec3(0.0f, 1.0f, 0.5f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec2(1.0f, 1.0f)}
 };
 
-unsigned int lightIndices[] = {
+GLuint turtleIndices[] = {
+    0, 1, 2,  0, 2, 3,
+    4, 6, 5,  4, 7, 6,
+    4, 5, 1,  4, 1, 0,
+    3, 2, 6,  3, 6, 7,
+    1, 5, 6,  1, 6, 2,
+    4, 0, 3,  4, 3, 7
+};
+
+Vertex lightVertices[] = {
+  //             COORDINATES               //
+	Vertex{glm::vec3(-0.1f, -0.1f,  0.1f)},
+	Vertex{glm::vec3(-0.1f, -0.1f, -0.1f)},
+	Vertex{glm::vec3(0.1f, -0.1f, -0.1f)},
+	Vertex{glm::vec3(0.1f, -0.1f,  0.1f)},
+	Vertex{glm::vec3(-0.1f,  0.1f,  0.1f)},
+	Vertex{glm::vec3(-0.1f,  0.1f, -0.1f)},
+	Vertex{glm::vec3(0.1f,  0.1f, -0.1f)},
+	Vertex{glm::vec3(0.1f,  0.1f,  0.1f)}
+};
+
+GLuint lightIndices[] = {
     0, 1, 2,
     0, 2, 3,
     4, 5, 6,
@@ -82,66 +88,64 @@ int main() {
         return -1;
     }
 
+    Texture planeTextures[] {
+		Texture("planks.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE),
+		Texture("planksSpec.png", "specular", 1, GL_RED, GL_UNSIGNED_BYTE)
+	};
+
     // Cube Object
 	Shader shaderProgram("default.vert", "default.frag");
 
-	VAO VAO1;
-	VAO1.Bind();
+	std::vector <Vertex> planeVerts(planeVertices, planeVertices + sizeof(planeVertices) / sizeof(Vertex));
+	std::vector <GLuint> planeInd(planeIndices, planeIndices + sizeof(planeIndices) / sizeof(GLuint));
+	std::vector <Texture> planeTex(planeTextures, planeTextures + sizeof(planeTextures) / sizeof(Texture));
 
-	VBO VBO1(planeVertices, sizeof(planeVertices));
-	EBO EBO1(planeIndices, sizeof(planeIndices));
+    Mesh plane(planeVerts, planeInd, planeTex);
 
-	VAO1.LinkAttrib(VBO1, 0, 3, GL_FLOAT, 11 * sizeof(float), (void*)0);
-    VAO1.LinkAttrib(VBO1, 1, 3, GL_FLOAT, 11 * sizeof(float), (void*)(3 * sizeof(float)));
-    VAO1.LinkAttrib(VBO1, 2, 2, GL_FLOAT, 11 * sizeof(float), (void*)(6 * sizeof(float)));
-    VAO1.LinkAttrib(VBO1, 3, 3, GL_FLOAT, 11 * sizeof(float), (void*)(8 * sizeof(float)));
+    // Tutle Object
+    Texture turtleTextures[] {
+		Texture("turtle.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE)
+	};
 
-	VAO1.Unbind();
-	VBO1.Unbind();
-	EBO1.Unbind();
+    std::vector <Vertex> turtleVerts(turtleVertices, turtleVertices + sizeof(turtleVertices) / sizeof(Vertex));
+	std::vector <GLuint> turtleInd(turtleIndices, turtleIndices + sizeof(turtleIndices) / sizeof(GLuint));
+	std::vector <Texture> turtleTex(turtleTextures, turtleTextures + sizeof(turtleTextures) / sizeof(Texture));
+
+    Mesh turtle(turtleVerts, turtleInd, turtleTex);
 
     // Light Object
     Shader lightShader("light.vert", "light.frag");
 
-	VAO lightVAO;
-	lightVAO.Bind();
+	std::vector <Vertex> lightVerts(lightVertices, lightVertices + sizeof(lightVertices) / sizeof(Vertex));
+	std::vector <GLuint> lightInd(lightIndices, lightIndices + sizeof(lightIndices) / sizeof(GLuint));
 
-	VBO lightVBO(lightVertices, sizeof(lightVertices));
-	EBO lightEBO(lightIndices, sizeof(lightIndices));
-
-	lightVAO.LinkAttrib(lightVBO, 0, 3, GL_FLOAT, 3 * sizeof(float), (void*)0);
-
-	lightVAO.Unbind();
-	lightVBO.Unbind();
-	lightEBO.Unbind();
+	Mesh light(lightVerts, lightInd, planeTex); // The light has no texture, so using the plane (as a default)
 
     glm::vec4 lightColor = glm::vec4(255.0f / 255.0f, 191.0f / 255.0f, 0.0f / 255.0f, 1.0f);
     glm::vec3 lightPos = glm::vec3(0.5f, -0.5f, 0.5f);
     glm::mat4 lightModel = glm::mat4(1.0f);
-    int lightType = 2; // 0 = Point, 1 = Directional, 2 = Spotlight
+    int lightType = 0; // 0 = Point, 1 = Directional, 2 = Spotlight
     glm::vec3 lightDirection = glm::vec3(-0.75f, -1.0f, -0.25f);
     lightModel = glm::translate(lightModel, lightPos);
 
-    glm::vec3 cubePos = glm::vec3(0.0f, -1.0f, 0.0f);
-    glm::mat4 cubeModel = glm::mat4(1.0f);
-    cubeModel = glm::translate(cubeModel, cubePos);
+    glm::vec3 planePos = glm::vec3(0.0f, -1.0f, 0.0f);
+    glm::mat4 planeModel = glm::mat4(1.0f);
+    planeModel = glm::translate(planeModel, planePos);
 
+    glm::vec3 turtlePos = glm::vec3(0.0f, -0.8f, 0.0f);
+    glm::mat4 turtleModel = glm::mat4(1.0f);
+    turtleModel = glm::translate(turtleModel, turtlePos);
+
+    // Pass Uniforms
     lightShader.Activate();
-    glUniformMatrix4fv(glGetUniformLocation(lightShader.ID, "model"), 1, GL_FALSE, glm::value_ptr(lightModel));
     glUniform4f(glGetUniformLocation(lightShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
     glUniform1i(glGetUniformLocation(lightShader.ID, "lightType"), lightType);
     glUniform3f(glGetUniformLocation(lightShader.ID, "lightDir"), lightDirection.x, lightDirection.y, lightDirection.z);
     shaderProgram.Activate();
-    glUniformMatrix4fv(glGetUniformLocation(shaderProgram.ID, "model"), 1, GL_FALSE, glm::value_ptr(cubeModel));
     glUniform4f(glGetUniformLocation(shaderProgram.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
     glUniform3f(glGetUniformLocation(shaderProgram.ID, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
     glUniform1i(glGetUniformLocation(shaderProgram.ID, "lightType"), lightType);
     glUniform3f(glGetUniformLocation(shaderProgram.ID, "lightDir"), lightDirection.x, lightDirection.y, lightDirection.z);
-
-    Texture plankTexture("turtle.png", GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE);
-	plankTexture.texUnit(shaderProgram, "tex0", 0);
-    Texture plankSpecular("planksSpec.png", GL_TEXTURE_2D, 1, GL_RED, GL_UNSIGNED_BYTE);
-    plankTexture.texUnit(shaderProgram, "tex1", 1);
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -159,33 +163,18 @@ int main() {
 
 		camera.UpdateMatrix(45.0f, 0.1f, 100.0f);
 
-        shaderProgram.Activate();
-        glUniform3f(glGetUniformLocation(shaderProgram.ID, "camPos"), camera.Position.x, camera.Position.y, camera.Position.z);
-        camera.Matrix(shaderProgram, "camMatrix");
-
-        plankTexture.Bind();
-        plankSpecular.Bind();
-		VAO1.Bind();
-
-		glDrawElements(GL_TRIANGLES, sizeof(planeIndices) / sizeof(int), GL_UNSIGNED_INT, 0);
-
-        lightShader.Activate();
-        camera.Matrix(lightShader, "camMatrix");
-
-        lightVAO.Bind();
-
-        glDrawElements(GL_TRIANGLES, sizeof(lightIndices) / sizeof(int), GL_UNSIGNED_INT, 0);
+        // Draw Events
+        plane.Draw(shaderProgram, camera, planeModel);
+        turtle.Draw(shaderProgram, camera, turtleModel);
+		light.Draw(lightShader, camera, lightModel);
 
         // Process Events
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
 
-	VAO1.Delete();
-	VBO1.Delete();
-	EBO1.Delete();
-    plankTexture.Delete();
 	shaderProgram.Delete();
+	lightShader.Delete();
 
 	glfwDestroyWindow(window);
 	glfwTerminate();

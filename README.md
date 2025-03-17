@@ -2,6 +2,8 @@
 
 This project is a basic game using OpenGL and C++.
 
+![example image of render](image.png)
+
 ## Requirements
 
 ### Required Libraries

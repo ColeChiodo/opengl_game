@@ -1,0 +1,11 @@
+Model Information:
+* title:	Ramlethal Weapon
+* source:	https://sketchfab.com/3d-models/ramlethal-weapon-5f795afa91014b6c925c19c4a625eac5
+* author:	Gintoki1234 (https://sketchfab.com/Gintoki1234)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Ramlethal Weapon" (https://sketchfab.com/3d-models/ramlethal-weapon-5f795afa91014b6c925c19c4a625eac5) by Gintoki1234 (https://sketchfab.com/Gintoki1234) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

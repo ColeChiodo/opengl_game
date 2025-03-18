@@ -2,7 +2,9 @@
 
 This project is a basic game using OpenGL and C++.
 
-![example image of render](image.png)
+![sushi_bar example render](sushi_bar.png)
+![ramlethal_weapons example render](ramlethal_weapons.png)
+![makoto_p3 example render](makoto_p3.gif)
 
 ## Requirements
 

@@ -43,7 +43,7 @@ vec4 directionalLight() {
 	float ambient = 0.2f;
 
 	vec3 norm = normalize(normal);
-	vec3 lightDirection = normalize(lightDir);
+	vec3 lightDirection = normalize(lightDir * vec3(-1.0f, -1.0f, -1.0f));
 	float diffuse = max(dot(norm, lightDirection), 0.0f);
 
 	float specularLight = 0.5f;

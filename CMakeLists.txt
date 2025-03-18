@@ -39,3 +39,7 @@ file(COPY ${PROJECT_SOURCE_DIR}/assets/shaders/ DESTINATION ${CMAKE_BINARY_DIR})
 # Copy the textures directory to the output directory (e.g., bin or build)
 # This ensures that textures are available during runtime
 file(COPY ${PROJECT_SOURCE_DIR}/assets/textures/ DESTINATION ${CMAKE_BINARY_DIR})
+
+# Copy the models directory to the output directory (e.g., bin or build)
+# This ensures that textures are available during runtime
+file(COPY ${PROJECT_SOURCE_DIR}/assets/models/ DESTINATION ${CMAKE_BINARY_DIR}/models/)

@@ -1,4 +1,4 @@
-#include "meshClass.h"
+#include "modelClass.h"
 
 const char* gameTitle = "Cole's Game";
 
@@ -6,67 +6,6 @@ unsigned int windowWidth = 1280;
 unsigned int windowHeight = 720;
 
 void windowInputs(GLFWwindow*);
-
-Vertex planeVertices[] = {
-  //             COORDINATES             /            COLORS          /           NORMALS          /  TEXTURE COORDINATES  //
-    Vertex{glm::vec3(-1.0f, 0.0f,  1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(0.0f, 0.0f)},
-	Vertex{glm::vec3(-1.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
-	Vertex{glm::vec3( 1.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 1.0f)},
-	Vertex{glm::vec3( 1.0f, 0.0f,  1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)}
-};
-
-GLuint planeIndices[] = {
-    0, 1, 2,
-	0, 2, 3,
-};
-
-Vertex turtleVertices[] = {
-  //             COORDINATES             /            COLORS          /           NORMALS          /  TEXTURE COORDINATES  //
-    Vertex{glm::vec3(-0.2f, -0.2f,  0.2f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 0.0f)},
-    Vertex{glm::vec3( 0.2f, -0.2f,  0.2f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 0.0f)},
-    Vertex{glm::vec3( 0.2f,  0.2f,  0.2f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(1.0f, 1.0f)},
-    Vertex{glm::vec3(-0.2f,  0.2f,  0.2f), glm::vec3(1.0f, 1.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
-    Vertex{glm::vec3(-0.2f, -0.2f, -0.2f), glm::vec3(1.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec2(1.0f, 0.0f)},
-    Vertex{glm::vec3( 0.2f, -0.2f, -0.2f), glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec2(0.0f, 0.0f)},
-    Vertex{glm::vec3( 0.2f,  0.2f, -0.2f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec2(0.0f, 1.0f)},
-    Vertex{glm::vec3(-0.2f,  0.2f, -0.2f), glm::vec3(0.0f, 1.0f, 0.5f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec2(1.0f, 1.0f)}
-};
-
-GLuint turtleIndices[] = {
-    0, 1, 2,  0, 2, 3,
-    4, 6, 5,  4, 7, 6,
-    4, 5, 1,  4, 1, 0,
-    3, 2, 6,  3, 6, 7,
-    1, 5, 6,  1, 6, 2,
-    4, 0, 3,  4, 3, 7
-};
-
-Vertex lightVertices[] = {
-  //             COORDINATES               //
-	Vertex{glm::vec3(-0.1f, -0.1f,  0.1f)},
-	Vertex{glm::vec3(-0.1f, -0.1f, -0.1f)},
-	Vertex{glm::vec3(0.1f, -0.1f, -0.1f)},
-	Vertex{glm::vec3(0.1f, -0.1f,  0.1f)},
-	Vertex{glm::vec3(-0.1f,  0.1f,  0.1f)},
-	Vertex{glm::vec3(-0.1f,  0.1f, -0.1f)},
-	Vertex{glm::vec3(0.1f,  0.1f, -0.1f)},
-	Vertex{glm::vec3(0.1f,  0.1f,  0.1f)}
-};
-
-GLuint lightIndices[] = {
-    0, 1, 2,
-    0, 2, 3,
-    4, 5, 6,
-    4, 6, 7,
-    4, 0, 3,
-    4, 3, 7,
-    1, 5, 6,
-    1, 6, 2,
-    4, 5, 1,
-    4, 1, 0,
-    3, 2, 6,
-    3, 6, 7
-};
 
 int main() {
 	if (!glfwInit()) {
@@ -90,59 +29,13 @@ int main() {
         return -1;
     }
 
-    Texture planeTextures[] {
-		Texture("planks.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE),
-		Texture("planksSpec.png", "specular", 1, GL_RED, GL_UNSIGNED_BYTE)
-	};
-
-    // Cube Object
 	Shader shaderProgram("default.vert", "default.frag");
 
-	std::vector <Vertex> planeVerts(planeVertices, planeVertices + sizeof(planeVertices) / sizeof(Vertex));
-	std::vector <GLuint> planeInd(planeIndices, planeIndices + sizeof(planeIndices) / sizeof(GLuint));
-	std::vector <Texture> planeTex(planeTextures, planeTextures + sizeof(planeTextures) / sizeof(Texture));
+    glm::vec4 lightColor = glm::vec4(255.0f / 255.0f, 255.0f / 255.0f, 255.0f / 255.0f, 1.0f);
+    glm::vec3 lightPos = glm::vec3(5.0f, -5.0f, 5.0f);
+    int lightType = 1; // 0 = Point, 1 = Directional, 2 = Spotlight
+    glm::vec3 lightDirection = glm::vec3(-0.0f, -1.0f, -0.75f);
 
-    Mesh plane(planeVerts, planeInd, planeTex);
-
-    // Tutle Object
-    Texture turtleTextures[] {
-		Texture("turtle.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE)
-	};
-
-    std::vector <Vertex> turtleVerts(turtleVertices, turtleVertices + sizeof(turtleVertices) / sizeof(Vertex));
-	std::vector <GLuint> turtleInd(turtleIndices, turtleIndices + sizeof(turtleIndices) / sizeof(GLuint));
-	std::vector <Texture> turtleTex(turtleTextures, turtleTextures + sizeof(turtleTextures) / sizeof(Texture));
-
-    Mesh turtle(turtleVerts, turtleInd, turtleTex);
-
-    // Light Object
-    Shader lightShader("light.vert", "light.frag");
-
-	std::vector <Vertex> lightVerts(lightVertices, lightVertices + sizeof(lightVertices) / sizeof(Vertex));
-	std::vector <GLuint> lightInd(lightIndices, lightIndices + sizeof(lightIndices) / sizeof(GLuint));
-
-	Mesh light(lightVerts, lightInd, planeTex); // The light has no texture, so using the plane (as a default)
-
-    glm::vec4 lightColor = glm::vec4(255.0f / 255.0f, 191.0f / 255.0f, 0.0f / 255.0f, 1.0f);
-    glm::vec3 lightPos = glm::vec3(0.5f, -0.5f, 0.5f);
-    glm::mat4 lightModel = glm::mat4(1.0f);
-    int lightType = 0; // 0 = Point, 1 = Directional, 2 = Spotlight
-    glm::vec3 lightDirection = glm::vec3(-0.75f, -1.0f, -0.25f);
-    lightModel = glm::translate(lightModel, lightPos);
-
-    glm::vec3 planePos = glm::vec3(0.0f, -1.0f, 0.0f);
-    glm::mat4 planeModel = glm::mat4(1.0f);
-    planeModel = glm::translate(planeModel, planePos);
-
-    glm::vec3 turtlePos = glm::vec3(0.0f, -0.8f, 0.0f);
-    glm::mat4 turtleModel = glm::mat4(1.0f);
-    turtleModel = glm::translate(turtleModel, turtlePos);
-
-    // Pass Uniforms
-    lightShader.Activate();
-    glUniform4f(glGetUniformLocation(lightShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
-    glUniform1i(glGetUniformLocation(lightShader.ID, "lightType"), lightType);
-    glUniform3f(glGetUniformLocation(lightShader.ID, "lightDir"), lightDirection.x, lightDirection.y, lightDirection.z);
     shaderProgram.Activate();
     glUniform4f(glGetUniformLocation(shaderProgram.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z, lightColor.w);
     glUniform3f(glGetUniformLocation(shaderProgram.ID, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
@@ -153,6 +46,12 @@ int main() {
 
 	Camera camera(windowWidth, windowHeight, glm::vec3(0.0f, 0.0f, 2.0f));
 
+    Model model("models/makoto_p3/scene.gltf");
+
+    model.position = glm::vec3(0.0f, 0.0f, 0.0f);
+    model.rotation = glm::vec3(90.0f, 0.0f, 0.0f);
+    model.scale = glm::vec3(0.01f);
+
     // For FPS Counter
     double prevTime = 0.0;
 	double currTime = 0.0;
@@ -161,6 +60,7 @@ int main() {
 
     // Main Loop
 	while (!glfwWindowShouldClose(window)) {
+        // FPS Counter
         currTime = glfwGetTime();
 		timeDiff = currTime - prevTime;
 		counter++;
@@ -183,20 +83,22 @@ int main() {
         windowInputs(window);
 		camera.Inputs(window);
 
-		camera.UpdateMatrix(45.0f, 0.1f, 100.0f);
+        // Game Update / Simulation
+        model.rotation.z += 0.5;
+
+        // Transform Updates
+		camera.UpdateMatrix(45.0f, 0.1f, 1000.0f);
+        model.UpdateMatrix();
 
         // Draw Events
-        plane.Draw(shaderProgram, camera, planeModel);
-        turtle.Draw(shaderProgram, camera, turtleModel);
-		light.Draw(lightShader, camera, lightModel);
+        model.Draw(shaderProgram, camera);
 
-        // Process Events
+        // Present Frame
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
 
 	shaderProgram.Delete();
-	lightShader.Delete();
 
 	glfwDestroyWindow(window);
 	glfwTerminate();

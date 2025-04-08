@@ -13,15 +13,17 @@ pkg_search_module(GLEW REQUIRED glew)
 find_package(OpenGL REQUIRED)
 
 # Add include directories (for both headers and libraries)
-include_directories(${GLFW3_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/include ${PROJECT_SOURCE_DIR}/lib/include)
+include_directories(${GLFW3_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/src/renderer ${PROJECT_SOURCE_DIR}/src ${PROJECT_SOURCE_DIR}/src/game ${PROJECT_SOURCE_DIR}/lib/include)
 
 # Add your source files (main.cpp, shader.cpp, stb_image.cpp, etc.)
 file(GLOB SOURCES 
     src/*.cpp
+    src/renderer/*.cpp
+    src/game/*.cpp
 )
 
 # Add stb_image.cpp explicitly (or you can just use the globbing pattern to include it)
-list(APPEND SOURCES src/stb_image.cpp)
+list(APPEND SOURCES src/renderer/stb_image.cpp)
 
 # Create the executable
 add_executable(OpenGLProject ${SOURCES})

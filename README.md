@@ -1,10 +1,12 @@
-# OpenGL Project
+# Game Title <span style="font-size: 60%;">by Cole</span>
 
-This project is a basic game using OpenGL and C++.
+This project will be a basic Multiplayer FPS game made in OpenGL and C++.
 
-![sushi_bar example render](sushi_bar.png)
-![ramlethal_weapons example render](ramlethal_weapons.png)
-![makoto_p3 example render](makoto_p3.gif)
+![sushi_bar example render](assets/readme/sushi_bar.png)
+![ramlethal_weapons example render](assets/readme/ramlethal_weapons.png)
+![makoto_p3 example render](assets/readme/makoto_p3.gif)
+
+# How to Setup and Build the Project Yourself
 
 ## Requirements
 

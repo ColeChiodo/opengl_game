@@ -1,4 +1,4 @@
-#include "modelClass.h"
+#include "Model.h"
 
 const char* gameTitle = "Cole's Game";
 
@@ -46,11 +46,11 @@ int main() {
 
 	Camera camera(windowWidth, windowHeight, glm::vec3(0.0f, 0.0f, 2.0f));
 
-    Model model("models/makoto_p3/scene.gltf");
+    Model model("models/sushi_bar/scene.gltf");
 
     model.position = glm::vec3(0.0f, 0.0f, 0.0f);
-    model.rotation = glm::vec3(90.0f, 0.0f, 0.0f);
-    model.scale = glm::vec3(0.01f);
+    model.rotation = glm::vec3(0.0f, 0.0f, 0.0f);
+    model.scale = glm::vec3(0.1f);
 
     // For FPS Counter
     double prevTime = 0.0;
@@ -84,7 +84,7 @@ int main() {
 		camera.Inputs(window);
 
         // Game Update / Simulation
-        model.rotation.z += 0.5;
+        model.rotation.y += 0.5;
 
         // Transform Updates
 		camera.UpdateMatrix(45.0f, 0.1f, 1000.0f);

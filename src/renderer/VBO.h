@@ -1,9 +1,9 @@
 #ifndef VBO_CLASS_H
 #define VBO_CLASS_H
 
-#include<glm/glm.hpp>
+#include <glm/glm.hpp>
 #include <GL/glew.h>
-#include<vector>
+#include <vector>
 
 struct Vertex {
 	glm::vec3 position;

@@ -26,7 +26,7 @@ class Camera {
         const float defaultSpeed = 0.05f;
         const float fastSpeed = 0.15f;
         float currSpeed = defaultSpeed;
-        float sensitivity = 75.0f;
+        float sensitivity = 0.1f;
 
         Camera(int width, int height, glm::vec3 position);
 

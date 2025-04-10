@@ -13,13 +13,32 @@ pkg_search_module(GLEW REQUIRED glew)
 find_package(OpenGL REQUIRED)
 
 # Add include directories (for both headers and libraries)
-include_directories(${GLFW3_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS} ${PROJECT_SOURCE_DIR}/src/renderer ${PROJECT_SOURCE_DIR}/src ${PROJECT_SOURCE_DIR}/src/game ${PROJECT_SOURCE_DIR}/lib/include)
+include_directories(
+    ${GLFW3_INCLUDE_DIRS}
+    ${GLEW_INCLUDE_DIRS}
+    ${PROJECT_SOURCE_DIR}/src
+    ${PROJECT_SOURCE_DIR}/src/core
+    ${PROJECT_SOURCE_DIR}/src/renderer
+    ${PROJECT_SOURCE_DIR}/src/game
+    ${PROJECT_SOURCE_DIR}/src/audio
+    ${PROJECT_SOURCE_DIR}/src/input
+    ${PROJECT_SOURCE_DIR}/src/network
+    ${PROJECT_SOURCE_DIR}/src/physics
+    ${PROJECT_SOURCE_DIR}/src/ui
+    ${PROJECT_SOURCE_DIR}/lib/include
+)
 
 # Add your source files (main.cpp, shader.cpp, stb_image.cpp, etc.)
 file(GLOB SOURCES 
     src/*.cpp
+    src/core/*.cpp
     src/renderer/*.cpp
     src/game/*.cpp
+    src/audio/*.cpp
+    src/input/*.cpp
+    src/network/*.cpp
+    src/physics/*.cpp
+    src/ui/*.cpp
 )
 
 # Add stb_image.cpp explicitly (or you can just use the globbing pattern to include it)

@@ -1,3 +1,5 @@
+#include <chrono>
+
 #include "core/Window.h"
 #include "game/Game.h"
 #include "renderer/Renderer.h"
@@ -23,8 +25,16 @@ int main() {
     double timeDiff;
     unsigned int counter = 0;
 
+    // Delta time
+    auto lastTime = std::chrono::high_resolution_clock::now();
+
     // Main game loop
     while (!appWindow.shouldClose()) {
+        // Delta time
+        auto currentTime = std::chrono::high_resolution_clock::now();
+        float deltaTime = std::chrono::duration<float>(currentTime - lastTime).count();
+        lastTime = currentTime;
+
         // FPS Counter Stuff
         currTime = glfwGetTime();
 		timeDiff = currTime - prevTime;
@@ -45,7 +55,7 @@ int main() {
         game.processInput();
 
         // Update game logic
-        game.Update();
+        game.Update(deltaTime);
 
         // Render Frame
         game.Render();

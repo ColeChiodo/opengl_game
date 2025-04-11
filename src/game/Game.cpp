@@ -13,7 +13,7 @@ void Game::Init() {
     auto sushi = scene.CreateEntity("Sushi");
     sushi.addComponent<ModelComponent>("models/sushi_bar/scene.gltf");
 
-    sushi.getComponent<ModelComponent>().model.scale = glm::vec3(0.1f);
+    sushi.getComponent<ModelComponent>().modelScale = glm::vec3(0.1f);
 
     // Light
     auto light = scene.CreateEntity("Light");
@@ -26,14 +26,16 @@ void Game::Init() {
     renderer.SetLighting(scene);
 }
 
-void Game::Update() {
+void Game::Update(float deltaTime) {
     // Update game logic here (e.g. move objects, handle AI, collisions, etc.)
-    auto view = scene.registry.view<ModelComponent>();
+    float rotationSpeed = 0.5f; // degrees per second
 
+    auto view = scene.registry.view<TransformComponent>();
     for (auto entity : view) {
-        auto& modelComp = view.get<ModelComponent>(entity);
-        modelComp.model.rotation.y += 0.5f;
+        auto& transformComp = view.get<TransformComponent>(entity);
+        transformComp.rotation.y += rotationSpeed * deltaTime;
     }
+
 }
 
 void Game::Render() {

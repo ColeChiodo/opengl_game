@@ -41,10 +41,21 @@ struct TransformComponent {
 
 struct ModelComponent {
     Model model;
+    glm::vec3 modelPosition = glm::vec3(0.0f);
+    glm::vec3 modelRotation = glm::vec3(0.0f);
+    glm::vec3 modelScale = glm::vec3(1.0f);
 
-    ModelComponent() = default;
-    ModelComponent(const char* file) : model(file) {}
-    ModelComponent(const ModelComponent&) = default;
+    ModelComponent(const char* path) : model(path) {}
+
+    glm::mat4 GetLocalTransform() const {
+        glm::mat4 mat = glm::mat4(1.0f);
+        mat = glm::translate(mat, modelPosition);
+        mat = glm::rotate(mat, glm::radians(modelRotation.x), glm::vec3(1, 0, 0));
+        mat = glm::rotate(mat, glm::radians(modelRotation.y), glm::vec3(0, 1, 0));
+        mat = glm::rotate(mat, glm::radians(modelRotation.z), glm::vec3(0, 0, 1));
+        mat = glm::scale(mat, modelScale);
+        return mat;
+    }
 };
 
 struct LightComponent {

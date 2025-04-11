@@ -14,7 +14,7 @@ class Game {
         ~Game();
 
         void Init();
-        void Update();
+        void Update(float deltaTime);
         void Render();
         void processInput();
 

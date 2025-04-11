@@ -33,13 +33,17 @@ void Renderer::SetLighting(Scene& scene) {
 void Renderer::DrawScene(Scene& scene, Camera& camera) {
     BeginFrame();
 
-    auto group = scene.registry.group<TransformComponent>(entt::get<ModelComponent>);
+    auto view = scene.registry.view<TransformComponent, ModelComponent>();
 
-    for (auto entity : group) {
-        auto& modelComp = group.get<ModelComponent>(entity);
-        modelComp.model.UpdateMatrix();
+    view.each([&](auto entity, TransformComponent& transform, ModelComponent& modelComp) {
+        glm::mat4 worldTransform = transform.GetTransform();
+        glm::mat4 modelLocalTransform = modelComp.GetLocalTransform();
+    
+        glm::mat4 finalTransform = worldTransform * modelLocalTransform;
+    
+        modelComp.model.SetMatrix(finalTransform);
         modelComp.model.Draw(shader, camera);
-    }
+    });
 
     camera.UpdateMatrix(45.0f, 0.1f, 1000.0f);
 

@@ -1,19 +1,14 @@
 #include "Scene.h"
+#include "Entity.h"
 
 Scene::Scene() {}
 
-void Scene::AddEntity(const Entity& entity) {
-    entities.push_back(entity);
-}
+Scene::~Scene() {}
 
-std::vector<Entity>& Scene::GetEntities() {
-    return entities;
-}
-
-void Scene::AddLight(const Light& light) {
-    lights.push_back(light);
-}
-
-std::vector<Light>& Scene::GetLights() {
-    return lights;
+Entity Scene::CreateEntity(const std::string& name) {
+    Entity entity = { registry.create(), this };
+    entity.addComponent<TransformComponent>();
+    auto& tag = entity.addComponent<TagComponent>();
+    tag.Tag = name.empty() ? "Entity" : name;
+    return entity;
 }

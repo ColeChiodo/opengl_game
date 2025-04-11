@@ -17,6 +17,7 @@ class Model {
         void Draw(Shader& shader, Camera& camera);
 
         void UpdateMatrix();
+        void SetMatrix(glm::mat4 matrix);
 
     private:
         const char* file;

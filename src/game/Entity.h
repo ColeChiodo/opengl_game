@@ -1,21 +1,49 @@
 #ifndef ENTITY_CLASS_H
 #define ENTITY_CLASS_H
 
-#include "renderer/Model.h"
+#include <iostream>
+#include <utility>
+#include "entt/entt.hpp"
+
+#include "Scene.h"
 
 class Entity {
-    public:
-        // entity components
+public:
+    Entity(entt::entity handle, Scene* scene)
+        : entityHandle(handle), scene(scene) {}
 
-        glm::vec3 position = glm::vec3(0.0f);
-        glm::vec3 rotation = glm::vec3(0.0f);
-        glm::vec3 scale = glm::vec3(1.0f);
+    template<typename T, typename... Args>
+    T& addComponent(Args&&... args) {
+        if (hasComponent<T>()) {
+            std::cerr << "Entity already has component" << std::endl;
+        }
+        return scene->registry.emplace<T>(entityHandle, std::forward<Args>(args)...);
+    }
 
-        Model model;
+    template<typename T>
+    T& getComponent() {
+        if (!hasComponent<T>()) {
+            std::cerr << "Entity does not have component" << std::endl;
+        }
+        return scene->registry.get<T>(entityHandle);
+    }
 
-        Entity(Model& model);
+    template<typename T>
+    bool hasComponent() {
+        return scene->registry.all_of<T>(entityHandle);
+    }
 
-    private:
+    template<typename T>
+    void removeComponent() {
+        if (!hasComponent<T>()) {
+            std::cerr << "Entity does not have component" << std::endl;
+        }
+        scene->registry.remove<T>(entityHandle);
+    }
+
+private:
+    entt::entity entityHandle;
+    Scene* scene;
 };
 
 #endif

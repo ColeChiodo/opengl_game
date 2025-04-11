@@ -29,6 +29,10 @@ void Model::UpdateMatrix() {
     modelMatrix = glm::scale(modelMatrix, scale);
 }
 
+void Model::SetMatrix(glm::mat4 matrix) {
+	modelMatrix = matrix;
+}
+
 void Model::loadMesh(unsigned int meshIndices) {
 	unsigned int posAccessorIndices = JSON["meshes"][meshIndices]["primitives"][0]["attributes"]["POSITION"];
 	unsigned int normalAccessorIndices = JSON["meshes"][meshIndices]["primitives"][0]["attributes"]["NORMAL"];

@@ -42,15 +42,13 @@ int main() {
 
         // Handle input
         appWindow.processInput();
-        game.ProcessInput();
+        game.processInput();
 
         // Update game logic
         game.Update();
 
-        // Begin and end rendering frame
-        renderer.BeginFrame();
+        // Render Frame
         game.Render();
-        renderer.EndFrame();
 
         // Swap buffers and poll events
         appWindow.swapBuffers();

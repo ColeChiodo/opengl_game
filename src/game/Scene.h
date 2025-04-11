@@ -1,22 +1,25 @@
 #ifndef SCENE_CLASS_H
 #define SCENE_CLASS_H
 
-#include <vector>
-#include "Entity.h"
-#include "renderer/Light.h"
+#include <string>
+
+#include "entt/entt.hpp"
+
+#include "Components.h"
+
+class Entity;
 
 class Scene {
     public:
-        std::vector<Entity> entities;
-        std::vector<Light> lights;
-
         Scene();
+        ~Scene();
 
-        void AddEntity(const Entity& Entity);
-        std::vector<Entity>& GetEntities();
+        Entity CreateEntity(const std::string& name);
 
-        void AddLight(const Light& Light);
-        std::vector<Light>& GetLights();
+        entt::registry registry;
+
+    private:
+        
 };
 
 #endif

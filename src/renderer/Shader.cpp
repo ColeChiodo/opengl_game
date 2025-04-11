@@ -50,6 +50,10 @@ void Shader::Delete() {
 	glDeleteProgram(ID);
 }
 
+void Shader::setBool(const std::string &name, bool value) const {
+    glUniform1i(glGetUniformLocation(ID, name.c_str()), (int)value);
+}
+
 void Shader::compileErrors(unsigned int shader, const char* type) {
 	GLint hasCompiled;
 	char infoLog[1024];

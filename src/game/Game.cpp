@@ -9,11 +9,25 @@ Game::~Game() {}
 void Game::Init() {
     // Initialize The Scene
 
+    // Plane
+    auto plane = scene.CreateEntity("Plane");
+    plane.addComponent<PrimitiveComponent>();
+
+    std::vector<Texture> texList = {
+        Texture("planks.png", "diffuse", 0),
+		Texture("planksSpec.png", "specular", 1)
+    };
+
+    plane.getComponent<PrimitiveComponent>().primitive.SetTextures(texList);
+    plane.getComponent<PrimitiveComponent>().primitive.generatePrimitive(PrimitiveType::Plane);
+    plane.getComponent<TransformComponent>().scale = glm::vec3(3.0f);
+
     // Sushi
     auto sushi = scene.CreateEntity("Sushi");
-    sushi.addComponent<ModelComponent>("models/sushi_bar/scene.gltf");
-
-    sushi.getComponent<ModelComponent>().modelScale = glm::vec3(0.1f);
+    sushi.addComponent<ModelComponent>("models/makoto_p3/scene.gltf");
+    sushi.getComponent<ModelComponent>().modelScale = glm::vec3(0.01f);
+    sushi.getComponent<ModelComponent>().modelRotation = glm::vec3(90.0f, 0.0f, 0.0f);
+    sushi.getComponent<ModelComponent>().modelPosition = glm::vec3(0.0f, 0.0f, 0.0f);
 
     // Light
     auto light = scene.CreateEntity("Light");
@@ -28,14 +42,14 @@ void Game::Init() {
 
 void Game::Update(float deltaTime) {
     // Update game logic here (e.g. move objects, handle AI, collisions, etc.)
-    float rotationSpeed = 0.5f; // degrees per second
+    float rotationSpeed = 5.0f; // degrees per second
 
-    auto view = scene.registry.view<TransformComponent>();
-    for (auto entity : view) {
-        auto& transformComp = view.get<TransformComponent>(entity);
-        transformComp.rotation.y += rotationSpeed * deltaTime;
-    }
-
+    auto view = scene.registry.view<TransformComponent, TagComponent>();
+    view.each([&](auto entity, TransformComponent& transformComp, TagComponent& tagComp) {
+        if (tagComp.Tag == "Sushi") {
+            transformComp.rotation.y += rotationSpeed * deltaTime;
+        }
+    });
 }
 
 void Game::Render() {

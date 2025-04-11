@@ -11,12 +11,11 @@ uniform sampler2D diffuse0;
 uniform sampler2D specular0;
 uniform vec4 lightColor;
 uniform vec3 lightPos;
-uniform int lightType; // 0 = Point, 1 = Directional, 2 = Spotlight
+uniform int lightType;
 uniform vec3 lightDir;
 uniform vec3 camPos;
+uniform bool useVertexColor;
 
-// Phong Reflection Model
-// ambient + diffuse + specular
 vec4 pointLight() {
 	vec3 lightVector = lightPos - currPos;
 	float dist = length(lightVector);
@@ -33,10 +32,13 @@ vec4 pointLight() {
 	float specularLight = 0.5f;
 	vec3 viewDirection = normalize(camPos - currPos);
 	vec3 reflectionDirection = reflect(-lightDirection, norm);
-	float specularAmount = pow(max(dot(viewDirection, reflectionDirection), 0.0f), 16);
+	float specularAmount = pow(max(dot(viewDirection, reflectionDirection), 0.0f), 32);
 	float specular = specularLight * specularAmount;
-	
-	return (texture(diffuse0, texCoord) * (diffuse * intensity + ambient) + texture(specular0, texCoord).r * specular * intensity) * lightColor;
+
+	vec4 baseColor = useVertexColor ? vec4(color, 1.0) : texture(diffuse0, texCoord);
+	float specMap = useVertexColor ? 0.0 : texture(specular0, texCoord).r;
+
+	return (baseColor * (diffuse * intensity + ambient) + specMap * specular * intensity) * lightColor;
 }
 
 vec4 directionalLight() {
@@ -49,10 +51,13 @@ vec4 directionalLight() {
 	float specularLight = 0.5f;
 	vec3 viewDirection = normalize(camPos - currPos);
 	vec3 reflectionDirection = reflect(-lightDirection, norm);
-	float specularAmount = pow(max(dot(viewDirection, reflectionDirection), 0.0f), 16);
+	float specularAmount = pow(max(dot(viewDirection, reflectionDirection), 0.0f), 32);
 	float specular = specularLight * specularAmount;
-	
-	return (texture(diffuse0, texCoord) * (diffuse + ambient) + texture(specular0, texCoord).r * specular) * lightColor;
+
+	vec4 baseColor = useVertexColor ? vec4(color, 1.0) : texture(diffuse0, texCoord);
+	float specMap = useVertexColor ? 0.0 : texture(specular0, texCoord).r;
+
+	return (baseColor * (diffuse + ambient) + specMap * specular) * lightColor;
 }
 
 vec4 spotLight() {
@@ -68,17 +73,19 @@ vec4 spotLight() {
 	float specularLight = 0.5f;
 	vec3 viewDirection = normalize(camPos - currPos);
 	vec3 reflectionDirection = reflect(-lightDirection, norm);
-	float specularAmount = pow(max(dot(viewDirection, reflectionDirection), 0.0f), 16);
+	float specularAmount = pow(max(dot(viewDirection, reflectionDirection), 0.0f), 32);
 	float specular = specularLight * specularAmount;
 
 	float angle = dot(lightDir, -lightDirection);
 	float intensity = clamp((angle - outerCone) / (innerCone - outerCone), 0.0f, 1.0f);
-	
-	return (texture(diffuse0, texCoord) * (diffuse * intensity + ambient) + texture(specular0, texCoord).r * specular * intensity) * lightColor;
+
+	vec4 baseColor = useVertexColor ? vec4(color, 1.0) : texture(diffuse0, texCoord);
+	float specMap = useVertexColor ? 0.0 : texture(specular0, texCoord).r;
+
+	return (baseColor * (diffuse * intensity + ambient) + specMap * specular * intensity) * lightColor;
 }
 
 void main() {
-	// 0 = Point, 1 = Directional, 2 = Spotlight
 	if (lightType == 0) {
         FragColor = pointLight();
     } else if (lightType == 1) {

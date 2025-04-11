@@ -8,6 +8,7 @@
 
 #include "renderer/Model.h"
 #include "renderer/Light.h"
+#include "renderer/Primitive.h"
 
 // struct IDComponent {
 //     UUID ID;
@@ -54,6 +55,27 @@ struct ModelComponent {
         mat = glm::rotate(mat, glm::radians(modelRotation.y), glm::vec3(0, 1, 0));
         mat = glm::rotate(mat, glm::radians(modelRotation.z), glm::vec3(0, 0, 1));
         mat = glm::scale(mat, modelScale);
+        return mat;
+    }
+};
+
+struct PrimitiveComponent {
+    Primitive primitive;
+    glm::vec3 primitivePosition = glm::vec3(0.0f);
+    glm::vec3 primitiveRotation = glm::vec3(0.0f);
+    glm::vec3 primitiveScale = glm::vec3(1.0f);
+
+    PrimitiveComponent() = default;
+    PrimitiveComponent(Primitive primitive) : primitive(primitive) {}
+    PrimitiveComponent(const PrimitiveComponent&) = default;
+
+    glm::mat4 GetLocalTransform() const {
+        glm::mat4 mat = glm::mat4(1.0f);
+        mat = glm::translate(mat, primitivePosition);
+        mat = glm::rotate(mat, glm::radians(primitiveRotation.x), glm::vec3(1, 0, 0));
+        mat = glm::rotate(mat, glm::radians(primitiveRotation.y), glm::vec3(0, 1, 0));
+        mat = glm::rotate(mat, glm::radians(primitiveRotation.z), glm::vec3(0, 0, 1));
+        mat = glm::scale(mat, primitiveScale);
         return mat;
     }
 };

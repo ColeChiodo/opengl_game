@@ -65,5 +65,7 @@ int main() {
         appWindow.pollEvents();
     }
 
+    std::cout << "Thanks For Playing My Game\n:]\n";
+
     return 0;
 }

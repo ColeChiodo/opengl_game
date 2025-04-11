@@ -33,19 +33,39 @@ void Renderer::SetLighting(Scene& scene) {
 void Renderer::DrawScene(Scene& scene, Camera& camera) {
     BeginFrame();
 
+    shader.setBool("useVertexColor", false);
+    DrawModels(scene, camera);
+
+    shader.setBool("useVertexColor", true);
+    DrawPrimitives(scene, camera);
+
+    camera.UpdateMatrix(90.0f, 0.1f, 1000.0f);
+
+    EndFrame();
+}
+
+void Renderer::DrawModels(Scene& scene, Camera& camera) {
     auto view = scene.registry.view<TransformComponent, ModelComponent>();
 
     view.each([&](auto entity, TransformComponent& transform, ModelComponent& modelComp) {
         glm::mat4 worldTransform = transform.GetTransform();
         glm::mat4 modelLocalTransform = modelComp.GetLocalTransform();
-    
         glm::mat4 finalTransform = worldTransform * modelLocalTransform;
-    
+
         modelComp.model.SetMatrix(finalTransform);
         modelComp.model.Draw(shader, camera);
     });
+}
 
-    camera.UpdateMatrix(45.0f, 0.1f, 1000.0f);
+void Renderer::DrawPrimitives(Scene& scene, Camera& camera) {
+    auto view = scene.registry.view<TransformComponent, PrimitiveComponent>();
 
-    EndFrame();
+    view.each([&](auto entity, TransformComponent& transform, PrimitiveComponent& primitiveComp) {
+        glm::mat4 worldTransform = transform.GetTransform();
+        glm::mat4 primitiveLocalTransform = primitiveComp.GetLocalTransform();
+        glm::mat4 finalTransform = worldTransform * primitiveLocalTransform;
+
+        primitiveComp.primitive.SetMatrix(finalTransform);
+        primitiveComp.primitive.Draw(shader, camera);
+    });
 }

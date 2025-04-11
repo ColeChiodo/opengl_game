@@ -18,6 +18,10 @@ class Renderer {
         void EndFrame();
         void SetLighting(Scene& scene);
         void DrawScene(Scene& scene, Camera& camera);
+
+    private:
+        void DrawModels(Scene& scene, Camera& camera);
+        void DrawPrimitives(Scene& scene, Camera& camera);
 };
 
 #endif

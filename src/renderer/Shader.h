@@ -17,7 +17,9 @@ class Shader {
 
         void Activate();
         void Delete();
-    
+
+        void setBool(const std::string &name, bool value) const;
+        
     private:
         void compileErrors(unsigned int shader, const char* type);
 };

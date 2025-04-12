@@ -1,33 +1,37 @@
 #include "Game.h"
 #include <iostream>
 
-Game::Game(Renderer& renderer, Camera& camera, Window& window)
-    : renderer(renderer), camera(camera), window(window) {}
+Game::Game(Renderer& renderer, Window& window)
+    : renderer(renderer), window(window) {}
 
 Game::~Game() {}
 
 void Game::Init() {
     // Initialize The Scene
 
+    // Player
+    Camera camera(window.width, window.height, glm::vec3(0.0f, 1.5f, 0.0f));
+    auto player = scene.CreateEntity("Player");
+    player.addComponent<CameraComponent>(camera, window);
+    player.getComponent<CameraComponent>().isPrimary = true;
+    player.addComponent<ModelComponent>("models/makoto_p3/scene.gltf");
+    player.getComponent<ModelComponent>().modelScale = glm::vec3(0.01f);
+    player.getComponent<ModelComponent>().modelRotation = glm::vec3(90.0f, 0.0f, 180.0f);
+
     // Plane
     auto plane = scene.CreateEntity("Plane");
     plane.addComponent<PrimitiveComponent>();
-
-    std::vector<Texture> texList = {
-        Texture("planks.png", "diffuse", 0),
-		Texture("planksSpec.png", "specular", 1)
-    };
-
-    plane.getComponent<PrimitiveComponent>().primitive.SetTextures(texList);
+    plane.getComponent<PrimitiveComponent>().primitive.SetColor(glm::vec3(0.78f, 0.467f, 0.0f));
     plane.getComponent<PrimitiveComponent>().primitive.generatePrimitive(PrimitiveType::Plane);
-    plane.getComponent<TransformComponent>().scale = glm::vec3(3.0f);
+    plane.getComponent<TransformComponent>().translation = glm::vec3(0.0f, 0.0f, 0.0f);
+    plane.getComponent<TransformComponent>().scale = glm::vec3(10.0f);
 
     // Sushi
     auto sushi = scene.CreateEntity("Sushi");
-    sushi.addComponent<ModelComponent>("models/makoto_p3/scene.gltf");
-    sushi.getComponent<ModelComponent>().modelScale = glm::vec3(0.01f);
-    sushi.getComponent<ModelComponent>().modelRotation = glm::vec3(90.0f, 0.0f, 0.0f);
-    sushi.getComponent<ModelComponent>().modelPosition = glm::vec3(0.0f, 0.0f, 0.0f);
+    sushi.addComponent<ModelComponent>("models/sushi_bar/scene.gltf");
+    sushi.getComponent<ModelComponent>().modelScale = glm::vec3(0.2f);
+    sushi.getComponent<ModelComponent>().modelPosition = glm::vec3(0.0f, 0.25, 0.0f);
+    sushi.getComponent<TransformComponent>().translation = glm::vec3(0.0f, 0.0f, -3.0f);
 
     // Light
     auto light = scene.CreateEntity("Light");
@@ -42,7 +46,7 @@ void Game::Init() {
 
 void Game::Update(float deltaTime) {
     // Update game logic here (e.g. move objects, handle AI, collisions, etc.)
-    float rotationSpeed = 5.0f; // degrees per second
+    float rotationSpeed = 0.5f; // degrees per second
 
     auto view = scene.registry.view<TransformComponent, TagComponent>();
     view.each([&](auto entity, TransformComponent& transformComp, TagComponent& tagComp) {
@@ -53,7 +57,12 @@ void Game::Update(float deltaTime) {
 }
 
 void Game::Render() {
-    renderer.DrawScene(scene, camera);
+    auto view = scene.registry.view<TransformComponent, CameraComponent>();
+    view.each([&](auto entity, TransformComponent& transformComp, CameraComponent& camComp) {
+        if (camComp.isPrimary) {
+            renderer.DrawScene(scene, camComp.camera);
+        }
+    });
 }
 
 void Game::processInput() {
@@ -63,5 +72,11 @@ void Game::processInput() {
         glfwSetWindowShouldClose(window.window, true);
     }
 
-    camera.Inputs(window.window);
+    // TODO replace with input component
+    auto view = scene.registry.view<TransformComponent, CameraComponent>();
+    view.each([&](auto entity, TransformComponent& transformComp, CameraComponent& camComp) {
+        if (camComp.isPrimary) {
+            camComp.camera.Inputs(window.window);
+        }
+    });
 }

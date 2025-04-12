@@ -6,16 +6,18 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/quaternion.hpp>
 
+#include "core/Window.h"
 #include "renderer/Model.h"
 #include "renderer/Light.h"
 #include "renderer/Primitive.h"
+#include "renderer/Camera.h"
 
-// struct IDComponent {
-//     UUID ID;
+struct IDComponent {
+    uint64_t ID;
 
-//     IDComponent() = default;
-//     IDComponent(const IDComponent&) = default;
-// };
+    IDComponent() = default;
+    IDComponent(const IDComponent&) = default;
+};
 
 struct TagComponent {
     std::string Tag;
@@ -88,7 +90,17 @@ struct LightComponent {
     LightComponent(const LightComponent&) = default;
 };
 
+struct CameraComponent {
+    Camera camera;
+    bool isPrimary = false;
+
+    CameraComponent() = default;
+    CameraComponent(Camera camera, Window& appWindow) : camera(camera) {
+        glfwSetWindowUserPointer(appWindow.window, &camera);
+    }
+    CameraComponent(const CameraComponent&) = default;
+};
+
 // TODO: 
-// Primative Component (Plane, Cube, Sphere)
 // Physics Components (RididBody, Cube Collider, Sphere Collider)
 // Game Rule Components

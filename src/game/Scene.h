@@ -15,11 +15,12 @@ class Scene {
         ~Scene();
 
         Entity CreateEntity(const std::string& name);
+        void DestroyEntity(Entity entity); // TODO
 
         entt::registry registry;
 
     private:
-        
+        uint64_t totalEntities = 0;
 };
 
 #endif

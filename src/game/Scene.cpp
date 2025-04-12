@@ -10,5 +10,11 @@ Entity Scene::CreateEntity(const std::string& name) {
     entity.addComponent<TransformComponent>();
     auto& tag = entity.addComponent<TagComponent>();
     tag.Tag = name.empty() ? "Entity" : name;
+    auto& id = entity.addComponent<IDComponent>();
+    id.ID = totalEntities++;
     return entity;
+}
+
+void Scene::DestroyEntity(Entity entity) {
+    registry.destroy(entity);
 }

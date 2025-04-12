@@ -12,11 +12,8 @@ int main() {
 
     Renderer renderer;
     renderer.Init();
-
-    Camera camera(appWindow.width, appWindow.height, glm::vec3(0.0f, 0.0f, 2.0f));
-    glfwSetWindowUserPointer(appWindow.window, &camera);
-
-    Game game(renderer, camera, appWindow);
+    
+    Game game(renderer, appWindow);
     game.Init();
 
     // FPS Counter Stuff

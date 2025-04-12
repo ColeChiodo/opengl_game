@@ -10,7 +10,7 @@
 
 class Game {
     public:
-        Game(Renderer& renderer, Camera& camera, Window& window);
+        Game(Renderer& renderer, Window& window);
         ~Game();
 
         void Init();
@@ -20,7 +20,6 @@ class Game {
 
     private:
         Renderer& renderer;
-        Camera& camera;
         Window& window;
         Scene scene;
 

@@ -41,6 +41,8 @@ public:
         scene->registry.remove<T>(entityHandle);
     }
 
+    operator entt::entity() const { return entityHandle; }
+
 private:
     entt::entity entityHandle;
     Scene* scene;

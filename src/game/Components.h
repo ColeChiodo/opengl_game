@@ -93,12 +93,25 @@ struct LightComponent {
 struct CameraComponent {
     Camera camera;
     bool isPrimary = false;
+    glm::vec3 cameraPosition = glm::vec3(0.0f);
+    glm::vec3 cameraRotation = glm::vec3(0.0f);
+    glm::vec3 cameraScale = glm::vec3(1.0f);
 
     CameraComponent() = default;
     CameraComponent(Camera camera, Window& appWindow) : camera(camera) {
         glfwSetWindowUserPointer(appWindow.window, &camera);
     }
     CameraComponent(const CameraComponent&) = default;
+
+    glm::mat4 GetLocalTransform() const {
+        glm::mat4 mat = glm::mat4(1.0f);
+        mat = glm::translate(mat, cameraPosition);
+        mat = glm::rotate(mat, glm::radians(cameraRotation.x), glm::vec3(1, 0, 0));
+        mat = glm::rotate(mat, glm::radians(cameraRotation.y), glm::vec3(0, 1, 0));
+        mat = glm::rotate(mat, glm::radians(cameraRotation.z), glm::vec3(0, 0, 1));
+        mat = glm::scale(mat, cameraScale);
+        return mat;
+    }
 };
 
 // TODO: 

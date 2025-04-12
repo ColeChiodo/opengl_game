@@ -22,6 +22,7 @@ class Renderer {
     private:
         void DrawModels(Scene& scene, Camera& camera);
         void DrawPrimitives(Scene& scene, Camera& camera);
+        void UpdateCameraMatrix(Scene& scene);
 };
 
 #endif

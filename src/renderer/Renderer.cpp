@@ -33,13 +33,13 @@ void Renderer::SetLighting(Scene& scene) {
 void Renderer::DrawScene(Scene& scene, Camera& camera) {
     BeginFrame();
 
+    UpdateCameraMatrix(scene);
+
     shader.setBool("useVertexColor", false);
     DrawModels(scene, camera);
 
     shader.setBool("useVertexColor", true);
     DrawPrimitives(scene, camera);
-
-    camera.UpdateMatrix(90.0f, 0.1f, 1000.0f);
 
     EndFrame();
 }
@@ -67,5 +67,15 @@ void Renderer::DrawPrimitives(Scene& scene, Camera& camera) {
 
         primitiveComp.primitive.SetMatrix(finalTransform);
         primitiveComp.primitive.Draw(shader, camera);
+    });
+}
+
+void Renderer::UpdateCameraMatrix(Scene& scene) {
+    auto view = scene.registry.view<TransformComponent, CameraComponent>();
+
+    view.each([&](auto entity, TransformComponent& transform, CameraComponent& camComp) {
+        if (camComp.isPrimary) {
+            camComp.camera.UpdateMatrix(90.0f, 0.1f, 1000.0f, transform.translation);
+        }
     });
 }

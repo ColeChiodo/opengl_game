@@ -16,7 +16,16 @@ void Game::Init() {
     player.getComponent<CameraComponent>().isPrimary = true;
     player.addComponent<ModelComponent>("models/makoto_p3/scene.gltf");
     player.getComponent<ModelComponent>().modelScale = glm::vec3(0.01f);
-    player.getComponent<ModelComponent>().modelRotation = glm::vec3(90.0f, 0.0f, 180.0f);
+    player.getComponent<ModelComponent>().modelRotation = glm::vec3(90.0f, 0.0f, 0.0f);
+
+    Camera camera2(window.width, window.height, glm::vec3(0.0f, 1.5f, 0.0f));
+    auto player2 = scene.CreateEntity("Player");
+    player2.addComponent<CameraComponent>(camera2, window);
+    player2.getComponent<CameraComponent>().isPrimary = false;
+    player2.addComponent<ModelComponent>("models/makoto_p3/scene.gltf");
+    player2.getComponent<ModelComponent>().modelScale = glm::vec3(0.01f);
+    player2.getComponent<ModelComponent>().modelRotation = glm::vec3(90.0f, 0.0f, 180.0f);
+    player2.getComponent<TransformComponent>().translation = glm::vec3(0.0f, 0.0f, 6.0f);
 
     // Plane
     auto plane = scene.CreateEntity("Plane");
@@ -31,7 +40,7 @@ void Game::Init() {
     sushi.addComponent<ModelComponent>("models/sushi_bar/scene.gltf");
     sushi.getComponent<ModelComponent>().modelScale = glm::vec3(0.2f);
     sushi.getComponent<ModelComponent>().modelPosition = glm::vec3(0.0f, 0.25, 0.0f);
-    sushi.getComponent<TransformComponent>().translation = glm::vec3(0.0f, 0.0f, -3.0f);
+    sushi.getComponent<TransformComponent>().translation = glm::vec3(0.0f, 0.0f, 3.0f);
 
     // Light
     auto light = scene.CreateEntity("Light");
@@ -47,11 +56,18 @@ void Game::Init() {
 void Game::Update(float deltaTime) {
     // Update game logic here (e.g. move objects, handle AI, collisions, etc.)
     float rotationSpeed = 0.5f; // degrees per second
+    float velocity = 1.0f;
 
-    auto view = scene.registry.view<TransformComponent, TagComponent>();
-    view.each([&](auto entity, TransformComponent& transformComp, TagComponent& tagComp) {
+    auto view = scene.registry.view<TransformComponent, TagComponent, CameraComponent>();
+
+    view.each([&](auto entity, TransformComponent& transformComp, TagComponent& tagComp, CameraComponent& camComp) {
         if (tagComp.Tag == "Sushi") {
             transformComp.rotation.y += rotationSpeed * deltaTime;
+        }
+
+        if (tagComp.Tag == "Player" && camComp.isPrimary) {
+            glm::vec3 forward = camComp.camera.GetForward();
+            transformComp.translation += forward * velocity * deltaTime;
         }
     });
 }
@@ -66,12 +82,6 @@ void Game::Render() {
 }
 
 void Game::processInput() {
-    // Handle input (e.g., ESC to exit, move camera, etc.)
-    // Here you can forward input processing to the window or camera
-    if (glfwGetKey(window.window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-        glfwSetWindowShouldClose(window.window, true);
-    }
-
     // TODO replace with input component
     auto view = scene.registry.view<TransformComponent, CameraComponent>();
     view.each([&](auto entity, TransformComponent& transformComp, CameraComponent& camComp) {

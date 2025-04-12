@@ -49,7 +49,6 @@ int main() {
 
         // Handle input
         appWindow.processInput();
-        game.processInput();
 
         // Update game logic
         game.Update(deltaTime);

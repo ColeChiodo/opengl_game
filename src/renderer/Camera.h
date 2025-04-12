@@ -30,9 +30,8 @@ class Camera {
 
         Camera(int width, int height, glm::vec3 position);
 
-        void UpdateMatrix(float FOVdeg, float nearPlane, float farPlane, glm::vec3 worldPosition);
+        void UpdateMatrix(float FOVdeg, float nearPlane, float farPlane, glm::vec3 worldPosition, glm::vec3 worldRotation);
         void Matrix(Shader& shader, const char* uniform);
-	    void Inputs(GLFWwindow* window);
 
         glm::vec3 GetForward() const;
 };

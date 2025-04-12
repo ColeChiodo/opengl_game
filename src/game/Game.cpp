@@ -17,6 +17,8 @@ void Game::Init() {
     player.addComponent<ModelComponent>("models/makoto_p3/scene.gltf");
     player.getComponent<ModelComponent>().modelScale = glm::vec3(0.01f);
     player.getComponent<ModelComponent>().modelRotation = glm::vec3(90.0f, 0.0f, 0.0f);
+    player.addComponent<InputComponent>();
+    player.getComponent<InputComponent>().enabled = true;
 
     Camera camera2(window.width, window.height, glm::vec3(0.0f, 1.5f, 0.0f));
     auto player2 = scene.CreateEntity("Player");
@@ -55,19 +57,17 @@ void Game::Init() {
 
 void Game::Update(float deltaTime) {
     // Update game logic here (e.g. move objects, handle AI, collisions, etc.)
+    // Process Inputs
+    inputs.Process(scene, deltaTime, window);
+
+    // World Object Events
     float rotationSpeed = 0.5f; // degrees per second
-    float velocity = 1.0f;
 
-    auto view = scene.registry.view<TransformComponent, TagComponent, CameraComponent>();
+    auto view = scene.registry.view<TransformComponent, TagComponent, CameraComponent, InputComponent>();
 
-    view.each([&](auto entity, TransformComponent& transformComp, TagComponent& tagComp, CameraComponent& camComp) {
+    view.each([&](auto entity, TransformComponent& transformComp, TagComponent& tagComp, CameraComponent& camComp, InputComponent& inComp) {
         if (tagComp.Tag == "Sushi") {
             transformComp.rotation.y += rotationSpeed * deltaTime;
-        }
-
-        if (tagComp.Tag == "Player" && camComp.isPrimary) {
-            glm::vec3 forward = camComp.camera.GetForward();
-            transformComp.translation += forward * velocity * deltaTime;
         }
     });
 }
@@ -77,16 +77,6 @@ void Game::Render() {
     view.each([&](auto entity, TransformComponent& transformComp, CameraComponent& camComp) {
         if (camComp.isPrimary) {
             renderer.DrawScene(scene, camComp.camera);
-        }
-    });
-}
-
-void Game::processInput() {
-    // TODO replace with input component
-    auto view = scene.registry.view<TransformComponent, CameraComponent>();
-    view.each([&](auto entity, TransformComponent& transformComp, CameraComponent& camComp) {
-        if (camComp.isPrimary) {
-            camComp.camera.Inputs(window.window);
         }
     });
 }

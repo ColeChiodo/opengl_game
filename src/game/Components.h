@@ -37,8 +37,13 @@ struct TransformComponent {
     TransformComponent(const glm::vec3& translation) : translation(translation) {}
 
     glm::mat4 GetTransform() const {
-        glm::mat4 rot = glm::toMat4(glm::quat(rotation));
-        return glm::translate(glm::mat4(1.0f), translation) * rot * glm::scale(glm::mat4(1.0f), scale);
+        glm::mat4 mat = glm::mat4(1.0f);
+        mat = glm::translate(mat, translation);
+        mat = glm::rotate(mat, glm::radians(rotation.x), glm::vec3(1, 0, 0));
+        mat = glm::rotate(mat, glm::radians(rotation.y), glm::vec3(0, 1, 0));
+        mat = glm::rotate(mat, glm::radians(rotation.z), glm::vec3(0, 0, 1));
+        mat = glm::scale(mat, scale);
+        return mat;
     }
 };
 
@@ -112,6 +117,16 @@ struct CameraComponent {
         mat = glm::scale(mat, cameraScale);
         return mat;
     }
+};
+
+struct InputComponent {
+    bool enabled = false;
+    bool lockMouse = true;
+
+    float pitch = 0.0f;
+    float yaw = 0.0f;
+    float moveSpeed = 5.0f;
+    float sensitivity = 0.1f;
 };
 
 // TODO: 

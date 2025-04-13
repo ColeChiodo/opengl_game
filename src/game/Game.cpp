@@ -23,6 +23,7 @@ void Game::Init() {
     // player.getComponent<ModelComponent>().modelScale = glm::vec3(0.0175f);
     player.addComponent<RigidbodyComponent>();
     player.addComponent<BoxColliderComponent>();
+    player.getComponent<BoxColliderComponent>().size = glm::vec3(0.5f, 1.0f, 0.5f);
 
     // Player 2
     auto player2 = scene.CreateEntity("Player");
@@ -36,14 +37,16 @@ void Game::Init() {
     player2.getComponent<ModelComponent>().modelScale = glm::vec3(0.0175f);
     player2.addComponent<RigidbodyComponent>();
     player2.addComponent<BoxColliderComponent>();
+    player2.getComponent<BoxColliderComponent>().size = glm::vec3(0.5f, 1.0f, 0.5f);
 
     // Cube
     auto cube = scene.CreateEntity("Cube");
-    cube.getComponent<TransformComponent>().translation = glm::vec3(2.0f, 5.0f, 5.0f);
+    cube.getComponent<TransformComponent>().translation = glm::vec3(2.0f, 1.0f, 5.0f);
     cube.addComponent<PrimitiveComponent>();
     cube.getComponent<PrimitiveComponent>().primitive.generatePrimitive(PrimitiveType::Cube);
-    cube.addComponent<RigidbodyComponent>();
+    //cube.addComponent<RigidbodyComponent>();
     cube.addComponent<BoxColliderComponent>();
+    cube.getComponent<BoxColliderComponent>().isStatic = true;
 
     // Cube 2
     auto cube2 = scene.CreateEntity("Cube");

@@ -6,12 +6,12 @@
 
 void InputSystem::Process(Scene& scene, float deltaTime, Window& winObj) {
     GLFWwindow* window = winObj.window;
-    auto view = scene.registry.view<TransformComponent, CameraComponent, InputComponent>();
+    auto view = scene.registry.view<TransformComponent, CameraComponent, InputComponent, RigidbodyComponent>();
 
     static double lastMouseX = winObj.width / 2.0;
     static double lastMouseY = winObj.height / 2.0;
 
-    view.each([&](auto entity, TransformComponent& transform, CameraComponent& camera, InputComponent& input) {
+    view.each([&](auto entity, TransformComponent& transform, CameraComponent& camera, InputComponent& input, RigidbodyComponent& rb) {
         if (!input.enabled) return;
 
         input.lockMouse = true;
@@ -65,6 +65,9 @@ void InputSystem::Process(Scene& scene, float deltaTime, Window& winObj) {
             if (glm::length(moveDir) > 0.01f) {
                 transform.translation += glm::normalize(moveDir) * input.moveSpeed * deltaTime;
             }
+
+            if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && rb.isGrounded) rb.velocity.y = input.jumpForce;
+
         } else {
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         }

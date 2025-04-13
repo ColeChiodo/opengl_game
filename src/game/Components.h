@@ -127,6 +127,7 @@ struct InputComponent {
     float pitch = 0.0f;
     float yaw = 0.0f;
     float moveSpeed = 5.0f;
+    float jumpForce = 10.0f;
     float sensitivity = 0.1f;
 };
 
@@ -134,6 +135,9 @@ struct RigidbodyComponent {
     glm::vec3 velocity = glm::vec3(0.0f);
     glm::vec3 acceleration = glm::vec3(0.0f);
     float mass = 1.0f;
+    float gravity = -30.0f;
+    float fallMultiplier = 1.1f;
+    bool isGrounded = true;
     bool affectedByGravity = true;
 };
 

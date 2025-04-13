@@ -5,7 +5,18 @@ void RigidbodySystem::Process(Scene& scene, float deltaTime) {
 
     view.each([&](auto entity, TransformComponent& transform, RigidbodyComponent& rb) {
         if (rb.affectedByGravity) {
-            rb.acceleration.y = -9.8f;
+        
+            if (rb.velocity.y < 0) {
+                rb.acceleration.y += rb.gravity * rb.fallMultiplier;
+            } else {
+                rb.acceleration.y += rb.gravity;
+            }
+        
+            if (rb.velocity.y == 0) {
+                rb.isGrounded = true;
+            } else {
+                rb.isGrounded = false;
+            }
         }
 
         rb.velocity += rb.acceleration * deltaTime;

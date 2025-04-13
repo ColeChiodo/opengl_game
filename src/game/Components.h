@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <unordered_set>
 
 #include "glm/glm.hpp"
 #include <glm/gtc/matrix_transform.hpp>
@@ -129,6 +130,19 @@ struct InputComponent {
     float sensitivity = 0.1f;
 };
 
+struct RigidbodyComponent {
+    glm::vec3 velocity = glm::vec3(0.0f);
+    glm::vec3 acceleration = glm::vec3(0.0f);
+    float mass = 1.0f;
+    bool affectedByGravity = true;
+};
+
+struct BoxColliderComponent {
+    glm::vec3 size = glm::vec3(1.0f);
+    glm::vec3 offset = glm::vec3(0.0f);
+    bool isStatic = false;
+    std::unordered_set<int> collisionMask = {0};
+};
+
 // TODO: 
-// Physics Components (RididBody, Cube Collider, Sphere Collider)
 // Game Rule Components

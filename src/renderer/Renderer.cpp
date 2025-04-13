@@ -2,7 +2,7 @@
 #include <iostream>
 
 Renderer::Renderer()
-    : shader("default.vert", "default.frag") {}
+    : shader("shaders/default.vert", "shaders/default.frag") {}
 
 Renderer::~Renderer() {
     shader.Delete();

@@ -55,11 +55,11 @@ target_link_libraries(OpenGLProject ${GLFW3_LIBRARIES} ${GLEW_LIBRARIES} OpenGL:
 
 # Copy the shaders directory to the output directory (e.g., bin or build)
 # This ensures that shaders are available during runtime
-file(COPY ${PROJECT_SOURCE_DIR}/assets/shaders/ DESTINATION ${CMAKE_BINARY_DIR})
+file(COPY ${PROJECT_SOURCE_DIR}/assets/shaders/ DESTINATION ${CMAKE_BINARY_DIR}/shaders/)
 
 # Copy the textures directory to the output directory (e.g., bin or build)
 # This ensures that textures are available during runtime
-file(COPY ${PROJECT_SOURCE_DIR}/assets/textures/ DESTINATION ${CMAKE_BINARY_DIR})
+file(COPY ${PROJECT_SOURCE_DIR}/assets/textures/ DESTINATION ${CMAKE_BINARY_DIR}/textures/)
 
 # Copy the models directory to the output directory (e.g., bin or build)
 # This ensures that textures are available during runtime

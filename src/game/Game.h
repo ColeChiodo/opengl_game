@@ -7,7 +7,9 @@
 #include "renderer/Camera.h"
 #include "renderer/Light.h"
 #include "core/Window.h"
-#include "input/Input.h"
+#include "input/InputSystem.h"
+#include "physics/RigidbodySystem.h"
+#include "physics/BoxColliderSystem.h"
 
 class Game {
     public:
@@ -22,7 +24,9 @@ class Game {
         Renderer& renderer;
         Window& window;
         Scene scene;
-        Input inputs;
+        InputSystem inputs;
+        RigidbodySystem rigidbodies;
+        BoxColliderSystem colliders;
 
         // You can later add more game states, variables, etc. (e.g. score, game state, etc.)
 };

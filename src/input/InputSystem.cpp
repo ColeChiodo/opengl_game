@@ -1,10 +1,10 @@
-#include "Input.h"
+#include "InputSystem.h"
 #include "game/Entity.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtc/constants.hpp>
 
-void Input::Process(Scene& scene, float deltaTime, Window& winObj) {
+void InputSystem::Process(Scene& scene, float deltaTime, Window& winObj) {
     GLFWwindow* window = winObj.window;
     auto view = scene.registry.view<TransformComponent, CameraComponent, InputComponent>();
 
@@ -28,15 +28,12 @@ void Input::Process(Scene& scene, float deltaTime, Window& winObj) {
             float deltaX = static_cast<float>(mouseX - lastMouseX);
             float deltaY = static_cast<float>(mouseY - lastMouseY);
 
-            // Update yaw from mouse X movement
             input.yaw -= deltaX * input.sensitivity;
             transform.rotation.y = input.yaw;
 
-            // Update pitch from mouse Y movement (camera only)
             input.pitch -= deltaY * input.sensitivity;
             input.pitch = glm::clamp(input.pitch, -89.0f, 89.0f);
 
-            // Calculate direction from pitch + yaw
             float pitchRad = glm::radians(input.pitch);
             float yawRad = glm::radians(input.yaw);
 
@@ -47,12 +44,12 @@ void Input::Process(Scene& scene, float deltaTime, Window& winObj) {
 
             camera.camera.Orientation = glm::normalize(forward);
 
-            // Center mouse and update lastMouse values
             glfwSetCursorPos(window, winObj.width / 2.0, winObj.height / 2.0);
             lastMouseX = winObj.width / 2.0;
             lastMouseY = winObj.height / 2.0;
 
             // WASD Movement
+            // TODO, edit the rigidbody by adding acceleration instead of directly changing the transform
             glm::vec3 moveDir(0.0f);
             glm::vec3 flatForward = camera.camera.GetForward();
             flatForward.y = 0.0f;

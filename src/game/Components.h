@@ -136,7 +136,7 @@ struct RigidbodyComponent {
     glm::vec3 acceleration = glm::vec3(0.0f);
     float mass = 1.0f;
     float gravity = -30.0f;
-    float fallMultiplier = 1.1f;
+    float fallMultiplier = 1.4f;
     bool isGrounded = true;
     bool affectedByGravity = true;
 };

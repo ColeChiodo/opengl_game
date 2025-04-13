@@ -1,4 +1,5 @@
 #include "BoxColliderSystem.h"
+#include <cfloat> // for FLT_MAX
 
 void BoxColliderSystem::Process(Scene& scene, float deltaTime) {
     auto view = scene.registry.view<TransformComponent, BoxColliderComponent>();
@@ -22,7 +23,6 @@ void BoxColliderSystem::Process(Scene& scene, float deltaTime) {
             if (!AABBTest(minA, maxA, minB, maxB)) continue;
             if (!MasksOverlap(maskA, maskB)) continue;
 
-            // Get mutable components to resolve
             auto& transformA = scene.registry.get<TransformComponent>(entityA);
             auto& transformB = scene.registry.get<TransformComponent>(entityB);
 
@@ -35,8 +35,9 @@ void BoxColliderSystem::Process(Scene& scene, float deltaTime) {
             penetration.y = std::min(maxA.y - minB.y, maxB.y - minA.y);
             penetration.z = std::min(maxA.z - minB.z, maxB.z - minA.z);
 
-            float minAxis = std::min({penetration.x, penetration.y, penetration.z});
+            float minAxis = std::min({ penetration.x, penetration.y, penetration.z });
 
+            // Resolution
             glm::vec3 resolveDir = glm::vec3(0.0f);
 
             if (minAxis == penetration.x) {
@@ -70,6 +71,12 @@ void BoxColliderSystem::Process(Scene& scene, float deltaTime) {
                 if (rbB) rbB->velocity = glm::vec3(0.0f);
             }
         }
+
+        // Ground Detection
+        RigidbodyComponent* rb = scene.registry.try_get<RigidbodyComponent>(entityA);
+        if (rb && !isStaticA) {
+            rb->isGrounded = IsGrounded(entityA, scene, 0.005f); // replace 0.05 with ray object
+        }
     }
 }
 
@@ -84,4 +91,56 @@ bool BoxColliderSystem::MasksOverlap(const std::unordered_set<int>& maskA, const
         if (maskB.count(a)) return true;
     }
     return false;
+}
+
+bool BoxColliderSystem::RayIntersectsAABB(const glm::vec3& rayOrigin, const glm::vec3& rayDir, const glm::vec3& boxMin, const glm::vec3& boxMax, float& tHit) {
+    float tMin = 0.0f;
+    float tMax = FLT_MAX;
+
+    for (int i = 0; i < 3; ++i) {
+        if (glm::abs(rayDir[i]) < 0.0001f) {
+            if (rayOrigin[i] < boxMin[i] || rayOrigin[i] > boxMax[i]) return false;
+        } else {
+            float ood = 1.0f / rayDir[i];
+            float t1 = (boxMin[i] - rayOrigin[i]) * ood;
+            float t2 = (boxMax[i] - rayOrigin[i]) * ood;
+
+            if (t1 > t2) std::swap(t1, t2);
+            tMin = std::max(tMin, t1);
+            tMax = std::min(tMax, t2);
+
+            if (tMin > tMax) return false;
+        }
+    }
+
+    tHit = tMin;
+    return true;
+}
+
+bool BoxColliderSystem::IsGrounded(entt::entity entity, Scene& scene, float rayLength) {
+    const auto& transform = scene.registry.get<TransformComponent>(entity);
+    const auto& collider = scene.registry.get<BoxColliderComponent>(entity);
+
+    // replace with ray object
+    glm::vec3 center = transform.translation + collider.offset;
+    glm::vec3 rayOrigin = center;
+    rayOrigin.y -= collider.size.y;
+    glm::vec3 rayDir = glm::vec3(0.0f, -1.0f, 0.0f);
+
+    bool found = false;
+    auto view = scene.registry.view<TransformComponent, BoxColliderComponent>();
+    view.each([&](auto other, TransformComponent& otherTransform, BoxColliderComponent& otherCollider) {
+        if (other != entity) {
+            glm::vec3 otherCenter = otherTransform.translation + otherCollider.offset;
+            glm::vec3 otherMin = otherCenter - otherCollider.size;
+            glm::vec3 otherMax = otherCenter + otherCollider.size;
+
+            float tHit;
+            if (RayIntersectsAABB(rayOrigin, rayDir, otherMin, otherMax, tHit) && tHit <= rayLength) {
+                found = true;
+            }
+        }
+    });
+
+    return found;
 }

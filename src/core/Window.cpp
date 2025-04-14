@@ -45,9 +45,8 @@ Window::Window(int width, int height, const char* title)
     glEnable(GL_DEPTH_TEST);
     glViewport(0, 0, 1280, 720);
 
-    // turns off vsync
-    // TODO: make optional
-    glfwSwapInterval(0);
+    // set vsync (TODO make optional)
+    glfwSwapInterval(1);
 }
 
 Window::~Window() {

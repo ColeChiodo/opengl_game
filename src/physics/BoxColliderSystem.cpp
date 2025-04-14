@@ -67,8 +67,8 @@ void BoxColliderSystem::Process(Scene& scene, float deltaTime) {
             } else if (!isStaticA && !isStaticB) {
                 transformA.translation += correction * 0.5f;
                 transformB.translation -= correction * 0.5f;
-                if (rbA) rbA->velocity = glm::vec3(0.0f);
-                if (rbB) rbB->velocity = glm::vec3(0.0f);
+                if (rbA) rbA->velocity = glm::vec3(0.0f, rbA->velocity.y, 0.0f);
+                if (rbB) rbB->velocity = glm::vec3(0.0f, rbB->velocity.y, 0.0f);
             }
         }
 
@@ -93,7 +93,7 @@ bool BoxColliderSystem::MasksOverlap(const std::unordered_set<int>& maskA, const
     return false;
 }
 
-bool BoxColliderSystem::RayIntersectsAABB(const glm::vec3& rayOrigin, const glm::vec3& rayDir, const glm::vec3& boxMin, const glm::vec3& boxMax, float& tHit) {
+bool RayIntersectsAABB(const glm::vec3& rayOrigin, const glm::vec3& rayDir, const glm::vec3& boxMin, const glm::vec3& boxMax, float& tHit) {
     float tMin = 0.0f;
     float tMax = FLT_MAX;
 

@@ -63,7 +63,13 @@ void InputSystem::Process(Scene& scene, float deltaTime, Window& winObj) {
             if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) moveDir -= right;
 
             if (glm::length(moveDir) > 0.01f) {
-                transform.translation += glm::normalize(moveDir) * input.moveSpeed * deltaTime;
+                glm::vec3 horizontalMove = glm::normalize(moveDir) * input.moveSpeed;
+                rb.velocity.x = horizontalMove.x;
+                rb.velocity.z = horizontalMove.z;
+            } else {
+                // Optional: apply damping or zero-out
+                rb.velocity.x = 0.0f;
+                rb.velocity.z = 0.0f;
             }
 
             if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && rb.isGrounded) rb.velocity.y = input.jumpForce;

@@ -124,10 +124,10 @@ struct InputComponent {
     bool enabled = false;
     bool lockMouse = true;
 
+    glm::vec3 moveDir = glm::vec3(0.0f);
     float pitch = 0.0f;
     float yaw = 0.0f;
-    float moveSpeed = 7.0f;
-    float jumpForce = 10.0f;
+    float moveSpeed = 8.0f;
     float sensitivity = 0.1f;
 };
 
@@ -135,10 +135,24 @@ struct RigidbodyComponent {
     glm::vec3 velocity = glm::vec3(0.0f);
     glm::vec3 acceleration = glm::vec3(0.0f);
     float mass = 1.0f;
-    float gravity = -30.0f;
+
+    float gravity = -33.3f;
     float fallMultiplier = 1.5f;
-    bool isGrounded = true;
     bool affectedByGravity = true;
+
+    bool isGrounded = true;
+
+    bool wantsToJump = false;
+    float jumpForce = 10.0f;
+
+    float maxHorizontalSpeed = 12.0f;
+    float airControlStrength = 5.0f;
+
+    float coyoteTime = 0.1f;
+    float coyoteTimer = 0.0f;
+
+    float jumpBufferTime = 0.1f;
+    float jumpBufferTimer = 0.0f;
 };
 
 struct BoxColliderComponent {

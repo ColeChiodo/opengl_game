@@ -1,5 +1,4 @@
 #include "BoxColliderSystem.h"
-#include <cfloat> // for FLT_MAX
 
 void BoxColliderSystem::Process(Scene& scene, float deltaTime) {
     auto view = scene.registry.view<TransformComponent, BoxColliderComponent>();

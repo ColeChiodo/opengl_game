@@ -50,29 +50,30 @@ void InputSystem::Process(Scene& scene, float deltaTime, Window& winObj) {
 
             // WASD Movement
             // TODO, edit the rigidbody by adding acceleration instead of directly changing the transform
-            glm::vec3 moveDir(0.0f);
+            input.moveDir = glm::vec3(0.0f);
             glm::vec3 flatForward = camera.camera.GetForward();
             flatForward.y = 0.0f;
             flatForward = glm::normalize(flatForward);
 
             glm::vec3 right = glm::normalize(glm::cross(flatForward, glm::vec3(0.0f, 1.0f, 0.0f)));
 
-            if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) moveDir += flatForward;
-            if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) moveDir -= flatForward;
-            if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) moveDir += right;
-            if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) moveDir -= right;
+            if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) input.moveDir += flatForward;
+            if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) input.moveDir -= flatForward;
+            if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) input.moveDir += right;
+            if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) input.moveDir -= right;
 
-            if (glm::length(moveDir) > 0.01f) {
-                glm::vec3 horizontalMove = glm::normalize(moveDir) * input.moveSpeed;
-                rb.velocity.x = horizontalMove.x;
-                rb.velocity.z = horizontalMove.z;
-            } else {
-                // Optional: apply damping or zero-out
-                rb.velocity.x = 0.0f;
-                rb.velocity.z = 0.0f;
-            }
+            if (rb.isGrounded) {
+                if (glm::length(input.moveDir) > 0.01f) {
+                    glm::vec3 horizontalMove = glm::normalize(input.moveDir) * input.moveSpeed;
+                    rb.velocity.x = horizontalMove.x;
+                    rb.velocity.z = horizontalMove.z;
+                } else {
+                    rb.velocity.x = 0.0f;
+                    rb.velocity.z = 0.0f;
+                }
+            }            
 
-            if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && rb.isGrounded) rb.velocity.y = input.jumpForce;
+            if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && rb.isGrounded) rb.wantsToJump = true;
 
         } else {
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);

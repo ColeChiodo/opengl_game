@@ -67,6 +67,19 @@ void Game::Init() {
     plane.getComponent<BoxColliderComponent>().size = glm::vec3(20.0f, 0.1f, 20.0f);
     plane.getComponent<BoxColliderComponent>().offset = glm::vec3(0.0f, -0.1f, 0.0f);
 
+    // Slope
+    auto slope = scene.CreateEntity("Plane");
+    slope.getComponent<TransformComponent>().translation = glm::vec3(0.0f, 2.0f, 23.0f);
+    slope.getComponent<TransformComponent>().rotation = glm::vec3(-30.0f, 0.00f, 0.0f);
+    slope.getComponent<TransformComponent>().scale = glm::vec3(5.0f, 0.0f, 5.0f);
+    slope.addComponent<PrimitiveComponent>();
+    slope.getComponent<PrimitiveComponent>().primitive.SetColor(glm::vec3(0.467f, 0.78f, 0.0f));
+    slope.getComponent<PrimitiveComponent>().primitive.generatePrimitive(PrimitiveType::Plane);
+    slope.addComponent<BoxColliderComponent>();
+    slope.getComponent<BoxColliderComponent>().isStatic = true;
+    slope.getComponent<BoxColliderComponent>().size = glm::vec3(5.0f, 0.1f, 5.0f);
+    slope.getComponent<BoxColliderComponent>().offset = glm::vec3(0.0f, -0.1f, 0.0f);
+
     // Sushi
     auto sushi = scene.CreateEntity("Sushi");
     sushi.getComponent<TransformComponent>().translation = glm::vec3(2.0f, 2.0f, 6.0f);

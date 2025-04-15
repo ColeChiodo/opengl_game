@@ -58,7 +58,7 @@ int main() {
 
         // Render Frame
         newImGuiFrame();
-        //game.Render();
+        game.Render();
         drawImGui(appWindow);
 
         // Swap buffers and poll events

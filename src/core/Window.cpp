@@ -49,15 +49,6 @@ Window::Window(int width, int height, const char* title)
     // set vsync (TODO make optional)
     glfwSwapInterval(1);
 
-    isFullscreen = !isFullscreen;
-
-    GLFWmonitor* monitor = glfwGetPrimaryMonitor();
-    const GLFWvidmode* mode = glfwGetVideoMode(monitor);
-
-    glfwGetWindowPos(window, &windowPosX, &windowPosY);
-    glfwGetWindowSize(window, &windowedWidth, &windowedHeight);
-    glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
-
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
@@ -101,7 +92,7 @@ void Window::processInput() {
 void Window::toggleFullscreen() {
     isFullscreen = !isFullscreen;
 
-    GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+    monitor = glfwGetPrimaryMonitor();
     const GLFWvidmode* mode = glfwGetVideoMode(monitor);
 
     if (isFullscreen) {

@@ -22,6 +22,7 @@ Window::Window(int width, int height, const char* title)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
     window = glfwCreateWindow(width, height, title, nullptr, nullptr);
     if (!window) {
@@ -47,6 +48,23 @@ Window::Window(int width, int height, const char* title)
 
     // set vsync (TODO make optional)
     glfwSwapInterval(1);
+
+    isFullscreen = !isFullscreen;
+
+    GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+    const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+
+    glfwGetWindowPos(window, &windowPosX, &windowPosY);
+    glfwGetWindowSize(window, &windowedWidth, &windowedHeight);
+    glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    io.DisplaySize = ImVec2((float)width, (float)height);
+    ImGui::StyleColorsDark();
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init("#version 330");
 }
 
 Window::~Window() {
@@ -95,8 +113,15 @@ void Window::toggleFullscreen() {
         glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
     } else {
         // Switch back to windowed mode
-        glfwSetWindowMonitor(window, nullptr, windowPosX, windowPosY, windowedWidth, windowedHeight, 0);
+        glfwSetWindowMonitor(window, nullptr, windowPosX, windowPosY, windowedWidth, windowedHeight, GLFW_DONT_CARE);
     }
+
+    int fbWidth = 0, fbHeight = 0;
+    do {
+        glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
+        glfwPollEvents();
+    } while (fbWidth == 0 || fbHeight == 0);
+
+    width = fbWidth;
+    height = fbHeight;
 }
-
-

@@ -25,7 +25,7 @@ include_directories(
     ${PROJECT_SOURCE_DIR}/src/network
     ${PROJECT_SOURCE_DIR}/src/physics
     ${PROJECT_SOURCE_DIR}/src/ui
-    ${PROJECT_SOURCE_DIR}/lib/include
+    ${PROJECT_SOURCE_DIR}/third_party
 )
 
 # Add your source files (main.cpp, shader.cpp, stb_image.cpp, etc.)
@@ -39,6 +39,7 @@ file(GLOB SOURCES
     src/network/*.cpp
     src/physics/*.cpp
     src/ui/*.cpp
+    third_party/imgui/*.cpp
 )
 
 # Add stb_image.cpp explicitly (or you can just use the globbing pattern to include it)

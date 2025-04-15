@@ -1,6 +1,10 @@
 #ifndef RENDERER_CLASS_H
 #define RENDERER_CLASS_H
 
+#include "imgui/imgui.h"
+#include "imgui/imgui_impl_glfw.h"
+#include "imgui/imgui_impl_opengl3.h"
+
 #include <GL/glew.h>
 #include "Shader.h"
 #include "Camera.h"
@@ -14,8 +18,6 @@ class Renderer {
         ~Renderer();
 
         void Init();
-        void BeginFrame();
-        void EndFrame();
         void SetLighting(Scene& scene);
         void DrawScene(Scene& scene, Camera& camera);
 
@@ -23,6 +25,8 @@ class Renderer {
         void DrawModels(Scene& scene, Camera& camera);
         void DrawPrimitives(Scene& scene, Camera& camera);
         void UpdateCameraMatrix(Scene& scene);
+        void BeginFrame();
+        void EndFrame();
 };
 
 #endif

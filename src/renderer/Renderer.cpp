@@ -6,6 +6,9 @@ Renderer::Renderer()
 
 Renderer::~Renderer() {
     shader.Delete();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui::DestroyContext();
 }
 
 void Renderer::Init() {

@@ -58,13 +58,13 @@ void Game::Init() {
     // Plane / Ground
     auto plane = scene.CreateEntity("Plane");
     plane.getComponent<TransformComponent>().translation = glm::vec3(0.0f, -0.01f, 0.0f);
-    plane.getComponent<TransformComponent>().scale = glm::vec3(100.0f, 0.0f, 100.0f);
+    plane.getComponent<TransformComponent>().scale = glm::vec3(20.0f, 0.0f, 20.0f);
     plane.addComponent<PrimitiveComponent>();
     plane.getComponent<PrimitiveComponent>().primitive.SetColor(glm::vec3(0.78f, 0.467f, 0.0f));
     plane.getComponent<PrimitiveComponent>().primitive.generatePrimitive(PrimitiveType::Plane);
     plane.addComponent<BoxColliderComponent>();
     plane.getComponent<BoxColliderComponent>().isStatic = true;
-    plane.getComponent<BoxColliderComponent>().size = glm::vec3(100.0f, 0.1f, 100.0f);
+    plane.getComponent<BoxColliderComponent>().size = glm::vec3(20.0f, 0.1f, 20.0f);
     plane.getComponent<BoxColliderComponent>().offset = glm::vec3(0.0f, -0.1f, 0.0f);
 
     // Sushi

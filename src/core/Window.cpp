@@ -44,11 +44,17 @@ Window::Window(int width, int height, const char* title)
     }
 
     glEnable(GL_DEPTH_TEST);
+
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    glFrontFace(GL_CCW);
+
     glViewport(0, 0, 1280, 720);
 
     // set vsync (TODO make optional)
-    glfwSwapInterval(1);
+    glfwSwapInterval(0);
 
+    // ImGui Stuff
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();

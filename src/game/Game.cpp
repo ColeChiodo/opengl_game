@@ -1,6 +1,9 @@
 #include "Game.h"
 #include <iostream>
 
+void newImGuiFrame();
+void drawImGui(Window& window);
+
 Game::Game(Renderer& renderer, Window& window)
     : renderer(renderer), window(window) {}
 
@@ -120,10 +123,42 @@ void Game::Update(float deltaTime) {
 }
 
 void Game::Render() {
+    newImGuiFrame();
+
     auto view = scene.registry.view<TransformComponent, CameraComponent>();
     view.each([&](auto entity, TransformComponent& transformComp, CameraComponent& camComp) {
         if (camComp.isPrimary) {
             renderer.DrawScene(scene, camComp.camera);
         }
     });
+
+    drawImGui(window);
+}
+
+void newImGuiFrame() {
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui::NewFrame();
+}
+
+void drawImGui(Window& window) {
+    ImGuiIO& io = ImGui::GetIO();
+
+    int framebufferWidth, framebufferHeight;
+    glfwGetFramebufferSize(window.window, &framebufferWidth, &framebufferHeight);
+    io.DisplaySize = ImVec2((float)framebufferWidth, (float)framebufferHeight);
+
+    ImDrawList* draw_list = ImGui::GetBackgroundDrawList();
+    ImU32 color = IM_COL32(255, 255, 0, 255);
+
+    float fontSize = 20.0f;
+    ImFont* font = ImGui::GetFont();
+
+    draw_list->AddText(font, fontSize, ImVec2(0, 0), color, glfwGetWindowTitle(window.window));
+    draw_list->AddText(font, fontSize, ImVec2(framebufferWidth - 100, 0), color, "Top Right");
+    draw_list->AddText(font, fontSize, ImVec2(0, framebufferHeight - 20), color, "Bottom Left");
+    draw_list->AddText(font, fontSize, ImVec2(framebufferWidth - 120, framebufferHeight - 20), color, "Bottom Right");
+
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }

@@ -24,8 +24,8 @@ void Primitive::generatePlane() {
     };
 
     GLuint indices[] = {
-        0, 1, 2,
-        0, 2, 3,
+        0, 2, 1,
+        0, 3, 2,
     };
 
     std::vector<Vertex> verts(vertices, vertices + sizeof(vertices) / sizeof(Vertex));

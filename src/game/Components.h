@@ -158,9 +158,11 @@ struct RigidbodyComponent {
 struct BoxColliderComponent {
     glm::vec3 size = glm::vec3(1.0f);
     glm::vec3 offset = glm::vec3(0.0f);
+    glm::quat rotation = glm::quat(1, 0, 0, 0);
     bool isStatic = false;
     std::unordered_set<int> collisionMask = {0};
 };
+
 
 // TODO: 
 // Game Rule Components

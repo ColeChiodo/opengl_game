@@ -30,7 +30,8 @@ void Game::Init() {
 
     // Player 2
     auto player2 = scene.CreateEntity("Player");
-    player2.getComponent<TransformComponent>().translation = glm::vec3(-2.0f, 0.0f, 3.0f);
+    player2.getComponent<TransformComponent>().translation = glm::vec3(-2.0f, 0.0f, 5.0f);
+    player2.getComponent<TransformComponent>().rotation = glm::vec3(0.0f, 180.0f, 0.0f);
     Camera camera2(window.width, window.height, glm::vec3(0.0f, 1.75f, 0.0f));
     player2.addComponent<CameraComponent>(camera, window);
     player2.addComponent<InputComponent>();
@@ -42,21 +43,13 @@ void Game::Init() {
     player2.addComponent<BoxColliderComponent>();
     player2.getComponent<BoxColliderComponent>().size = glm::vec3(0.5f, 1.0f, 0.5f);
 
-    // Static Cube
+    // Cube
     auto cube = scene.CreateEntity("Cube");
     cube.getComponent<TransformComponent>().translation = glm::vec3(2.0f, 1.0f, 6.0f);
     cube.addComponent<PrimitiveComponent>();
     cube.getComponent<PrimitiveComponent>().primitive.generatePrimitive(PrimitiveType::Cube);
     cube.addComponent<BoxColliderComponent>();
     cube.getComponent<BoxColliderComponent>().isStatic = true;
-
-    // Pushable Cube
-    auto cube2 = scene.CreateEntity("Cube");
-    cube2.getComponent<TransformComponent>().translation = glm::vec3(-2.0f, 1.0f, 6.0f);
-    cube2.addComponent<PrimitiveComponent>();
-    cube2.getComponent<PrimitiveComponent>().primitive.generatePrimitive(PrimitiveType::Cube);
-    cube2.addComponent<RigidbodyComponent>();
-    cube2.addComponent<BoxColliderComponent>();
 
     // Plane / Ground
     auto plane = scene.CreateEntity("Plane");
@@ -72,16 +65,16 @@ void Game::Init() {
 
     // Slope
     auto slope = scene.CreateEntity("Plane");
-    slope.getComponent<TransformComponent>().translation = glm::vec3(0.0f, 2.0f, 23.0f);
-    slope.getComponent<TransformComponent>().rotation = glm::vec3(-30.0f, 0.00f, 0.0f);
-    slope.getComponent<TransformComponent>().scale = glm::vec3(5.0f, 0.0f, 5.0f);
+    slope.getComponent<TransformComponent>().translation = glm::vec3(0.0f, 1.0f, 23.0f);
+    slope.getComponent<TransformComponent>().rotation = glm::vec3(-15.0f, 0.00f, 0.0f);
+    slope.getComponent<TransformComponent>().scale = glm::vec3(10.0f, 0.0f, 10.0f);
     slope.addComponent<PrimitiveComponent>();
     slope.getComponent<PrimitiveComponent>().primitive.SetColor(glm::vec3(0.467f, 0.78f, 0.0f));
     slope.getComponent<PrimitiveComponent>().primitive.generatePrimitive(PrimitiveType::Plane);
     slope.addComponent<BoxColliderComponent>();
     slope.getComponent<BoxColliderComponent>().isStatic = true;
-    slope.getComponent<BoxColliderComponent>().size = glm::vec3(5.0f, 0.1f, 5.0f);
-    slope.getComponent<BoxColliderComponent>().offset = glm::vec3(0.0f, -0.1f, 0.0f);
+    slope.getComponent<BoxColliderComponent>().size = glm::vec3(10.0f, 0.1f, 10.0f);
+
 
     // Sushi
     auto sushi = scene.CreateEntity("Sushi");
@@ -113,9 +106,9 @@ void Game::Update(float deltaTime) {
 
     auto view = scene.registry.view<TransformComponent, TagComponent>();
 
-    view.each([&](auto entity, TransformComponent& transformComp, TagComponent& tagComp) {
-        if (tagComp.Tag == "Sushi") {
-            transformComp.rotation.y += rotationSpeed * deltaTime;
+    view.each([&](auto entity, TransformComponent& transform, TagComponent& tag) {
+        if (tag.Tag == "Sushi") {
+            transform.rotation.y += rotationSpeed * deltaTime;
         }
     });
 
@@ -157,7 +150,7 @@ void drawImGui(Window& window) {
     draw_list->AddText(font, fontSize, ImVec2(0, 0), color, glfwGetWindowTitle(window.window));
     draw_list->AddText(font, fontSize, ImVec2(framebufferWidth - 100, 0), color, "Top Right");
     draw_list->AddText(font, fontSize, ImVec2(0, framebufferHeight - 20), color, "Bottom Left");
-    draw_list->AddText(font, fontSize, ImVec2(framebufferWidth - 120, framebufferHeight - 20), color, "Bottom Right");
+    draw_list->AddText(font, fontSize, ImVec2(framebufferWidth - 130, framebufferHeight - 20), color, "Bottom Right");
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

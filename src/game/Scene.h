@@ -15,7 +15,7 @@ class Scene {
         ~Scene();
 
         Entity CreateEntity(const std::string& name);
-        void DestroyEntity(Entity entity);
+        void DestroyEntity(entt::entity entity);
 
         entt::registry registry;
 

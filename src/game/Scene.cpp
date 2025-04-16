@@ -15,6 +15,6 @@ Entity Scene::CreateEntity(const std::string& name) {
     return entity;
 }
 
-void Scene::DestroyEntity(Entity entity) {
+void Scene::DestroyEntity(entt::entity entity) {
     registry.destroy(entity);
 }

@@ -1,5 +1,5 @@
 #include "RigidbodySystem.h"
-#include "BoxColliderSystem.h"
+#include "CollisionUtil.h"
 
 void RigidbodySystem::Process(Scene& scene, float deltaTime) {
     auto view = scene.registry.view<TransformComponent, RigidbodyComponent, BoxColliderComponent>();
@@ -15,9 +15,8 @@ void RigidbodySystem::Process(Scene& scene, float deltaTime) {
                 rb.acceleration.y += rb.gravity;
         }
 
-        // Handle jump only if input is present
+        // Handle Jump
         if (input) {
-            // Jump buffering (set rb.jumpBufferTimer to jumpBufferTime on jump input)
             if (rb.wantsToJump) {
                 rb.jumpBufferTimer = rb.jumpBufferTime;
                 rb.wantsToJump = false;
@@ -90,19 +89,18 @@ void RigidbodySystem::Process(Scene& scene, float deltaTime) {
         otherView.each([&](auto other, const TransformComponent& otherTransform, const BoxColliderComponent& otherCollider) {
             if (other == entity || !otherCollider.isStatic) return;
 
-            glm::vec3 otherCenter = otherTransform.translation + otherCollider.offset;
-            glm::vec3 otherMin = otherCenter - otherCollider.size;
-            glm::vec3 otherMax = otherCenter + otherCollider.size;
-
             float tHit;
-            if (RayIntersectsAABB(start, glm::normalize(movement), otherMin, otherMax, tHit)) {
+            OBB otherOBB = CreateOBB(otherTransform, otherCollider);
+
+            glm::vec3 rayDir = glm::normalize(movement);
+            if (RayIntersectsOBB(start, rayDir, otherOBB, tHit)) {
                 float hitDist = tHit * glm::length(movement) - deltaTime;
                 if (hitDist < glm::length(movement)) {
                     if (tHit < closestHit) {
                         closestHit = tHit;
-                        finalMovement = glm::normalize(movement) * hitDist;
+                        finalMovement = rayDir * hitDist;
 
-                        // // Lateral collision
+                        // Lateral collision resolution: Stop movement along the axis that collided
                         // if (glm::abs(movement.x) > glm::abs(movement.z)) {
                         //     rb.velocity.x = 0.0f;
                         // } else {
@@ -112,13 +110,21 @@ void RigidbodySystem::Process(Scene& scene, float deltaTime) {
                 }
             }
         });
-
+        
         transform.translation += finalMovement;
-
         rb.acceleration = glm::vec3(0.0f);
 
+        // Apply coyote time
         if (rb.isGrounded) {
+            rb.velocity.y = 0.0f;
             rb.coyoteTimer = rb.coyoteTime;
+        }
+
+        // Update coyote time
+        if (!rb.isGrounded) {
+            if (rb.coyoteTimer > 0.0f) {
+                rb.coyoteTimer -= deltaTime;
+            }
         }
     });
 }

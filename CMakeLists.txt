@@ -12,7 +12,7 @@ pkg_search_module(GLEW REQUIRED glew)
 # Find OpenGL
 find_package(OpenGL REQUIRED)
 
-# Add include directories (for both headers and libraries)
+# Add include directories
 include_directories(
     ${GLFW3_INCLUDE_DIRS}
     ${GLEW_INCLUDE_DIRS}
@@ -26,9 +26,10 @@ include_directories(
     ${PROJECT_SOURCE_DIR}/src/physics
     ${PROJECT_SOURCE_DIR}/src/ui
     ${PROJECT_SOURCE_DIR}/third_party
+    ${PROJECT_SOURCE_DIR}/third_party/enet
 )
 
-# Add your source files (main.cpp, shader.cpp, stb_image.cpp, etc.)
+# Add source files
 file(GLOB SOURCES 
     src/*.cpp
     src/core/*.cpp
@@ -42,26 +43,37 @@ file(GLOB SOURCES
     third_party/imgui/*.cpp
 )
 
-# Add stb_image.cpp explicitly (or you can just use the globbing pattern to include it)
+# Add stb_image.cpp explicitly
 list(APPEND SOURCES src/renderer/stb_image.cpp)
 
 # Create the executable
 add_executable(OpenGLProject ${SOURCES})
 
-# Add Definition for Enabling GLM Experiemental Mode
+# Add Definition for Enabling GLM Experimental Mode
 add_definitions(-DGLM_ENABLE_EXPERIMENTAL)
 
-# Link the libraries
-target_link_libraries(OpenGLProject ${GLFW3_LIBRARIES} ${GLEW_LIBRARIES} OpenGL::GL)
+# Link libraries based on platform
+if(WIN32)
+    target_link_libraries(OpenGLProject
+        PRIVATE 
+            ${GLFW3_LIBRARIES} 
+            ${GLEW_LIBRARIES} 
+            OpenGL::GL
+            ws2_32
+            winmm
+    )
+elseif(UNIX)
+    target_link_libraries(OpenGLProject
+        PRIVATE 
+            ${GLFW3_LIBRARIES} 
+            ${GLEW_LIBRARIES} 
+            OpenGL::GL
+            pthread
+            dl
+    )
+endif()
 
-# Copy the shaders directory to the output directory (e.g., bin or build)
-# This ensures that shaders are available during runtime
+# Copy assets (shaders, textures, models)
 file(COPY ${PROJECT_SOURCE_DIR}/assets/shaders/ DESTINATION ${CMAKE_BINARY_DIR}/shaders/)
-
-# Copy the textures directory to the output directory (e.g., bin or build)
-# This ensures that textures are available during runtime
 file(COPY ${PROJECT_SOURCE_DIR}/assets/textures/ DESTINATION ${CMAKE_BINARY_DIR}/textures/)
-
-# Copy the models directory to the output directory (e.g., bin or build)
-# This ensures that textures are available during runtime
 file(COPY ${PROJECT_SOURCE_DIR}/assets/models/ DESTINATION ${CMAKE_BINARY_DIR}/models/)

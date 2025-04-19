@@ -11,6 +11,20 @@
 #include "physics/RigidbodySystem.h"
 #include "physics/BoxColliderSystem.h"
 
+#include <thread>
+#include <network/Server.h>
+#include <network/Client.h>
+
+void startServer();
+void startClient();
+
+enum class GameState {
+    MainMenu,
+    ConnectionMenu,
+    Playing,
+    Paused
+};
+
 class Game {
     public:
         Game(Renderer& renderer, Window& window);
@@ -23,12 +37,19 @@ class Game {
     private:
         Renderer& renderer;
         Window& window;
+
         Scene scene;
         InputSystem inputs;
         RigidbodySystem rigidbodies;
         BoxColliderSystem colliders;
 
-        // You can later add more game states, variables, etc. (e.g. score, game state, etc.)
+        GameState currentState = GameState::MainMenu;
+
+        void UpdateGameplay(float deltaTime);
+
+        void RenderMainMenu();
+        void RenderConnectionMenu();
+        void RenderGameplay();
 };
 
 #endif

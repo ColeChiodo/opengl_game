@@ -93,7 +93,37 @@ void Game::Init() {
 }
 
 void Game::Update(float deltaTime) {
-    // Update game logic here (e.g. move objects, handle AI, collisions, etc.)
+    switch (currentState) {
+        case GameState::Playing:
+            UpdateGameplay(deltaTime);
+            break;
+        default:
+            break;
+    }
+}
+
+void Game::Render() {
+    newImGuiFrame();
+
+    switch (currentState) {
+        case GameState::MainMenu:
+            RenderMainMenu();
+            break;
+        case GameState::ConnectionMenu:
+            RenderConnectionMenu();
+            break;
+        case GameState::Playing:
+            RenderGameplay();
+            break;
+        default:
+            break;
+    }
+
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+void Game::UpdateGameplay(float deltaTime) {
     // Process Inputs
     inputs.Process(scene, deltaTime, window);
 
@@ -115,9 +145,7 @@ void Game::Update(float deltaTime) {
     renderer.SetLighting(scene);
 }
 
-void Game::Render() {
-    newImGuiFrame();
-
+void Game::RenderGameplay() {
     auto view = scene.registry.view<TransformComponent, CameraComponent>();
     view.each([&](auto entity, TransformComponent& transformComp, CameraComponent& camComp) {
         if (camComp.isPrimary) {
@@ -125,7 +153,109 @@ void Game::Render() {
         }
     });
 
-    drawImGui(window);
+    ImGuiIO& io = ImGui::GetIO();
+
+    int framebufferWidth, framebufferHeight;
+    glfwGetFramebufferSize(window.window, &framebufferWidth, &framebufferHeight);
+    io.DisplaySize = ImVec2((float)framebufferWidth, (float)framebufferHeight);
+
+    // Optional background text overlay
+    ImDrawList* draw_list = ImGui::GetBackgroundDrawList();
+    ImU32 color = IM_COL32(255, 255, 0, 255);
+    float fontSize = 20.0f;
+    ImFont* font = ImGui::GetFont();
+
+    draw_list->AddText(font, fontSize, ImVec2(0, 0), color, glfwGetWindowTitle(window.window));
+    draw_list->AddText(font, fontSize, ImVec2(framebufferWidth - 100, 0), color, "Top Right");
+    draw_list->AddText(font, fontSize, ImVec2(0, framebufferHeight - 20), color, "Bottom Left");
+    draw_list->AddText(font, fontSize, ImVec2(framebufferWidth - 130, framebufferHeight - 20), color, "Bottom Right");
+}
+
+void Game::RenderMainMenu() {
+    glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    ImGuiIO& io = ImGui::GetIO();
+    ImVec2 windowSize(200, 130);  // Slightly taller to fit vertical buttons
+    ImVec2 center((io.DisplaySize.x - windowSize.x) * 0.5f, (io.DisplaySize.y - windowSize.y) * 0.5f);
+    ImGui::SetNextWindowPos(center);
+    ImGui::SetNextWindowSize(windowSize);
+
+    ImGui::Begin("Main Menu", nullptr,
+        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
+        ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground
+    );
+
+    ImVec2 buttonSize(100, 30); // Wider buttons for better appearance
+    float buttonSpacing = 15.0f;
+
+    // Calculate X position to center buttons
+    float buttonX = (windowSize.x - buttonSize.x) * 0.5f;
+
+    float topPadding = 30.0f;
+    ImGui::SetCursorPosY(topPadding);
+
+    ImGui::SetCursorPosX(buttonX);
+    if (ImGui::Button("Play", buttonSize)) {
+        currentState = GameState::ConnectionMenu;
+    }
+
+    ImGui::SetCursorPosY(ImGui::GetCursorPosY() + buttonSpacing);
+    ImGui::SetCursorPosX(buttonX);
+    if (ImGui::Button("Quit", buttonSize)) {
+        glfwSetWindowShouldClose(window.window, true);
+    }
+
+    ImGui::End();
+}
+
+void Game::RenderConnectionMenu() {
+    glClearColor(0.07f, 0.13f, 0.17f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    ImGuiIO& io = ImGui::GetIO();
+    ImVec2 windowSize(300, 200);
+    ImVec2 center((io.DisplaySize.x - windowSize.x) * 0.5f, (io.DisplaySize.y - windowSize.y) * 0.5f);
+    ImGui::SetNextWindowPos(center);
+    ImGui::SetNextWindowSize(windowSize);
+
+    ImGui::Begin("Connection", nullptr,
+        ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
+        ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoBackground
+    );
+
+    ImVec2 buttonSize(100, 30); // slightly wider
+    float buttonSpacing = 15.0f;
+
+    // Calculate X position to center buttons
+    float buttonX = (windowSize.x - buttonSize.x) * 0.5f;
+
+    // Add space from top if you want it more visually centered
+    float topPadding = 30.0f;
+    ImGui::SetCursorPosY(topPadding);
+
+    ImGui::SetCursorPosX(buttonX);
+    if (ImGui::Button("Host", buttonSize)) {
+        startServer();
+        Init();
+        currentState = GameState::Playing;
+    }
+
+    ImGui::SetCursorPosY(ImGui::GetCursorPosY() + buttonSpacing);
+    ImGui::SetCursorPosX(buttonX);
+    if (ImGui::Button("Client", buttonSize)) {
+        startClient();
+        Init();
+        currentState = GameState::Playing;
+    }
+
+    ImGui::SetCursorPosY(ImGui::GetCursorPosY() + buttonSpacing);
+    ImGui::SetCursorPosX(buttonX);
+    if (ImGui::Button("Back", buttonSize)) {
+        currentState = GameState::MainMenu;
+    }
+
+    ImGui::End();
 }
 
 void newImGuiFrame() {
@@ -134,24 +264,24 @@ void newImGuiFrame() {
     ImGui::NewFrame();
 }
 
-void drawImGui(Window& window) {
-    ImGuiIO& io = ImGui::GetIO();
+void startServer() {
+    Client client;
 
-    int framebufferWidth, framebufferHeight;
-    glfwGetFramebufferSize(window.window, &framebufferWidth, &framebufferHeight);
-    io.DisplaySize = ImVec2((float)framebufferWidth, (float)framebufferHeight);
+    // Start server in background
+    std::thread([]() {
+        Server host(nullptr, 1111);
+        host.Run();
+    }).detach();
 
-    ImDrawList* draw_list = ImGui::GetBackgroundDrawList();
-    ImU32 color = IM_COL32(255, 255, 0, 255);
+    // Delay slightly to let the server fully start before connecting. bad, swap to "while not started" loop
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
-    float fontSize = 20.0f;
-    ImFont* font = ImGui::GetFont();
+    client.Connect("127.0.0.1", 1111);
+    client.Send("Hello from host/client!");
+}
 
-    draw_list->AddText(font, fontSize, ImVec2(0, 0), color, glfwGetWindowTitle(window.window));
-    draw_list->AddText(font, fontSize, ImVec2(framebufferWidth - 100, 0), color, "Top Right");
-    draw_list->AddText(font, fontSize, ImVec2(0, framebufferHeight - 20), color, "Bottom Left");
-    draw_list->AddText(font, fontSize, ImVec2(framebufferWidth - 130, framebufferHeight - 20), color, "Bottom Right");
-
-    ImGui::Render();
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+void startClient() {
+    Client client;
+    client.Connect("127.0.0.1", 1111);
+    client.Send("Hello from client!");
 }

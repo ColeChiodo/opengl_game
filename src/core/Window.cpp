@@ -121,4 +121,7 @@ void Window::toggleFullscreen() {
 
     width = fbWidth;
     height = fbHeight;
+
+    ImGuiIO& io = ImGui::GetIO();
+    io.DisplaySize = ImVec2((float)width, (float)height);
 }

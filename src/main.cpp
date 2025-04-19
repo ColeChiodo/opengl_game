@@ -1,14 +1,10 @@
-#include <chrono>
 #define ENET_IMPLEMENTATION
+#include <chrono>
 
 #include "core/Window.h"
 #include "game/Game.h"
 #include "renderer/Renderer.h"
 #include "renderer/Camera.h"
-
-#include <string>
-#include <network/Server.h>
-#include <network/Client.h>
 
 const char* gameTitle = "Cole's Game";
 
@@ -19,7 +15,6 @@ int main() {
     renderer.Init();
     
     Game game(renderer, appWindow);
-    game.Init();
 
     // FPS Counter Stuff
     double prevTime = 0.0;
@@ -30,57 +25,41 @@ int main() {
     // Delta time
     auto lastTime = std::chrono::high_resolution_clock::now();
 
-    std::string ans;
-    std::cout << "[s] - server | [c] - client: ";
-    std::cin >> ans;
+    // Main game loop
+    while (!appWindow.shouldClose()) {
+        // Delta time
+        auto currentTime = std::chrono::high_resolution_clock::now();
+        float deltaTime = std::chrono::duration<float>(currentTime - lastTime).count();
+        lastTime = currentTime;
 
-    if (ans == "s") {
-        Server host;
-        host.Run();
-    } else if (ans == "c") {
-        Client client;
-        client.Connect("127.0.0.1", 1234);
-        client.Send("Hello from client!");
+        // FPS Counter Stuff
+        currTime = glfwGetTime();
+		timeDiff = currTime - prevTime;
+		counter++;
 
-        // Wait a bit to allow the server to receive
-        enet_host_service(client.client, nullptr, 1000);
+		if (timeDiff >= 1.0 / 10.0) {
+			std::string FPS = std::to_string((1.0 / timeDiff) * counter);
+			std::string ms = std::to_string((timeDiff / counter) * 1000);
+			std::string newTitle = std::string(gameTitle) + " - " + FPS + "FPS / " + ms + "ms";
+			glfwSetWindowTitle(appWindow.window, newTitle.c_str());
+
+			prevTime = currTime;
+			counter = 0;
+		}
+
+        // Handle input
+        appWindow.processInput();
+
+        // Update game logic
+        game.Update(deltaTime);
+
+        // Render Frame
+        game.Render();
+
+        // Swap buffers and poll events
+        appWindow.swapBuffers();
+        appWindow.pollEvents();
     }
-
-    // // Main game loop
-    // while (!appWindow.shouldClose()) {
-    //     // Delta time
-    //     auto currentTime = std::chrono::high_resolution_clock::now();
-    //     float deltaTime = std::chrono::duration<float>(currentTime - lastTime).count();
-    //     lastTime = currentTime;
-
-    //     // FPS Counter Stuff
-    //     currTime = glfwGetTime();
-	// 	timeDiff = currTime - prevTime;
-	// 	counter++;
-
-	// 	if (timeDiff >= 1.0 / 10.0) {
-	// 		std::string FPS = std::to_string((1.0 / timeDiff) * counter);
-	// 		std::string ms = std::to_string((timeDiff / counter) * 1000);
-	// 		std::string newTitle = std::string(gameTitle) + " - " + FPS + "FPS / " + ms + "ms";
-	// 		glfwSetWindowTitle(appWindow.window, newTitle.c_str());
-
-	// 		prevTime = currTime;
-	// 		counter = 0;
-	// 	}
-
-    //     // Handle input
-    //     appWindow.processInput();
-
-    //     // Update game logic
-    //     game.Update(deltaTime);
-
-    //     // Render Frame
-    //     game.Render();
-
-    //     // Swap buffers and poll events
-    //     appWindow.swapBuffers();
-    //     appWindow.pollEvents();
-    // }
 
     std::cout << "Thanks For Playing My Game\n:]\n";
 

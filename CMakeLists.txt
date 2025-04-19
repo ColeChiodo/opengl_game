@@ -26,7 +26,6 @@ include_directories(
     ${PROJECT_SOURCE_DIR}/src/physics
     ${PROJECT_SOURCE_DIR}/src/ui
     ${PROJECT_SOURCE_DIR}/third_party
-    ${PROJECT_SOURCE_DIR}/third_party/enet
 )
 
 # Add source files

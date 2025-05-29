@@ -22,7 +22,7 @@ Mesh::Mesh(std::vector <Vertex>& vertices, std::vector <GLuint>& indices, std::v
 
 void Mesh::Draw(Shader& shader, Camera& camera, glm::mat4 matrix, glm::vec3 translation, glm::quat rotation, glm::vec3 scale) {
 	shader.Activate();
-	vao.Bind();
+	VAO.Bind();
 
 	unsigned int numDiffuse = 0;
 	unsigned int numSpecular = 0;

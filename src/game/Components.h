@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <sstream>
 #include <unordered_set>
 
 #include "glm/glm.hpp"
@@ -18,6 +19,10 @@ struct IDComponent {
 
     IDComponent() = default;
     IDComponent(const IDComponent&) = default;
+
+    std::string Serialize() const {
+        return std::to_string(ID);
+    }
 };
 
 struct TagComponent {
@@ -26,6 +31,10 @@ struct TagComponent {
     TagComponent() = default;
     TagComponent(const TagComponent&) = default;
     TagComponent(const std::string& tag) : Tag(tag) {}
+
+    std::string Serialize() const {
+        return Tag;
+    }
 };
 
 struct TransformComponent {
@@ -46,6 +55,14 @@ struct TransformComponent {
         mat = glm::scale(mat, scale);
         return mat;
     }
+
+    std::string Serialize() const {
+        std::ostringstream ss;
+        ss << translation.x << " " << translation.y << " " << translation.z << " ";
+        ss << rotation.x << " " << rotation.y << " " << rotation.z << " ";
+        ss << scale.x << " " << scale.y << " " << scale.z;
+        return ss.str();
+    }
 };
 
 struct ModelComponent {
@@ -64,6 +81,15 @@ struct ModelComponent {
         mat = glm::rotate(mat, glm::radians(modelRotation.z), glm::vec3(0, 0, 1));
         mat = glm::scale(mat, modelScale);
         return mat;
+    }
+
+    std::string Serialize() const {
+        std::ostringstream ss;
+        ss << model.getPath() << " ";
+        ss << modelPosition.x << " " << modelPosition.y << " " << modelPosition.z << " ";
+        ss << modelRotation.x << " " << modelRotation.y << " " << modelRotation.z << " ";
+        ss << modelScale.x << " " << modelScale.y << " " << modelScale.z;
+        return ss.str();
     }
 };
 

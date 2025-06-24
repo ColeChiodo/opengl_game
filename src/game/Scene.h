@@ -2,6 +2,7 @@
 #define SCENE_CLASS_H
 
 #include <string>
+#include <sstream>
 
 #include "entt/entt.hpp"
 
@@ -16,6 +17,8 @@ class Scene {
 
         Entity CreateEntity(const std::string& name);
         void DestroyEntity(entt::entity entity);
+
+        std::string Serialize();
 
         entt::registry registry;
 

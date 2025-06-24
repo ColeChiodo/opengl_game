@@ -34,18 +34,18 @@ int main() {
 
         // FPS Counter Stuff
         currTime = glfwGetTime();
-		timeDiff = currTime - prevTime;
-		counter++;
+		    timeDiff = currTime - prevTime;
+		    counter++;
 
-		if (timeDiff >= 1.0 / 10.0) {
-			std::string FPS = std::to_string((1.0 / timeDiff) * counter);
-			std::string ms = std::to_string((timeDiff / counter) * 1000);
-			std::string newTitle = std::string(gameTitle) + " - " + FPS + "FPS / " + ms + "ms";
-			glfwSetWindowTitle(appWindow.window, newTitle.c_str());
+		    if (timeDiff >= 1.0 / 10.0) {
+			      std::string FPS = std::to_string((1.0 / timeDiff) * counter);
+			      std::string ms = std::to_string((timeDiff / counter) * 1000);
+			      std::string newTitle = std::string(gameTitle) + " - " + FPS + "FPS / " + ms + "ms";
+			      glfwSetWindowTitle(appWindow.window, newTitle.c_str());
 
-			prevTime = currTime;
-			counter = 0;
-		}
+			      prevTime = currTime;
+			      counter = 0;
+		    }
 
         // Handle input
         appWindow.processInput();

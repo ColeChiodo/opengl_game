@@ -39,8 +39,36 @@ void Client::Connect(const std::string& host, enet_uint16 port) {
     }
 }
 
-void Client::Send(const std::string& msg) {
-    ENetPacket* packet = enet_packet_create(msg.c_str(), msg.length() + 1, ENET_PACKET_FLAG_RELIABLE);
+void Client::Send(const std::string& msg, MessageType type) {
+    // Compose the message as: "type|payload"
+    std::string packetData = std::to_string(type) + "|" + msg;
+
+    ENetPacket* packet = enet_packet_create(packetData.c_str(), packetData.size() + 1, ENET_PACKET_FLAG_RELIABLE);
     enet_peer_send(peer, 0, packet);
     enet_host_flush(client);
+}
+
+void Client::Poll() {
+    ENetEvent event;
+    while (enet_host_service(client, &event, 0) > 0) {
+        if (event.type == ENET_EVENT_TYPE_RECEIVE) {
+            std::string receivedMsg(reinterpret_cast<char*>(event.packet->data));
+            // Parse the message type
+            size_t separator = receivedMsg.find('|');
+            if (separator != std::string::npos) {
+                int type = std::stoi(receivedMsg.substr(0, separator));
+                std::string payload = receivedMsg.substr(separator + 1);
+
+                if (type == SEND_SCENE) {
+                    std::cout << "Received Scene: " << payload << std::endl;
+                    // TODO: Deserialize and apply scene
+                }
+            }
+            enet_packet_destroy(event.packet);
+        }
+    }
+}
+
+void Client::RequestScene() {
+    Send("", REQUEST_SCENE);
 }

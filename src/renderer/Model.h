@@ -19,6 +19,8 @@ class Model {
         void UpdateMatrix();
         void SetMatrix(glm::mat4 matrix);
 
+        const char* getPath() const { return file; }
+
     private:
         const char* file;
         std::vector<unsigned char> data;

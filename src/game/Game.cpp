@@ -93,6 +93,7 @@ void Game::Init() {
 }
 
 void Game::Update(float deltaTime) {
+    client.Poll();
     switch (currentState) {
         case GameState::Playing:
             UpdateGameplay(deltaTime);
@@ -125,7 +126,7 @@ void Game::Render() {
 
 void Game::UpdateGameplay(float deltaTime) {
     // Process Inputs
-    inputs.Process(scene, deltaTime, window);
+    inputs.Process(scene, deltaTime, window, client);
 
     // Process Physics
     rigidbodies.Process(scene, deltaTime);
@@ -237,7 +238,7 @@ void Game::RenderConnectionMenu() {
     ImGui::SetCursorPosX(buttonX);
     if (ImGui::Button("Host", buttonSize)) {
         startServer();
-        Init();
+        //Init();
         currentState = GameState::Playing;
     }
 
@@ -245,7 +246,7 @@ void Game::RenderConnectionMenu() {
     ImGui::SetCursorPosX(buttonX);
     if (ImGui::Button("Client", buttonSize)) {
         startClient();
-        Init();
+        //Init();
         currentState = GameState::Playing;
     }
 
@@ -264,24 +265,28 @@ void newImGuiFrame() {
     ImGui::NewFrame();
 }
 
-void startServer() {
-    Client client;
-
+void Game::startServer() {
     // Start server in background
-    std::thread([]() {
-        Server host(nullptr, 1111);
+    std::thread([this]() {
+        Server host(nullptr, 23456, &scene);
         host.Run();
     }).detach();
 
     // Delay slightly to let the server fully start before connecting. bad, swap to "while not started" loop
     std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    
+    // connect to local host port 23456
+    client.Connect("127.0.0.1", 23456);
+    client.Send("Hello from host/client!", CHAT_MESSAGE);
 
-    client.Connect("127.0.0.1", 1111);
-    client.Send("Hello from host/client!");
+    // initialize the game. build the scene
+    Init();
 }
 
-void startClient() {
-    Client client;
-    client.Connect("127.0.0.1", 1111);
-    client.Send("Hello from client!");
+void Game::startClient() {
+    client.Connect("127.0.0.1", 23456);
+    client.Send("Hello from client!", CHAT_MESSAGE);
+
+    // request the scene from the server
+    client.RequestScene();
 }

@@ -4,7 +4,7 @@
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtc/constants.hpp>
 
-void InputSystem::Process(Scene& scene, float deltaTime, Window& winObj) {
+void InputSystem::Process(Scene& scene, float deltaTime, Window& winObj, Client& client) {
     GLFWwindow* window = winObj.window;
     auto view = scene.registry.view<TransformComponent, CameraComponent, InputComponent, RigidbodyComponent>();
 
@@ -61,11 +61,6 @@ void InputSystem::Process(Scene& scene, float deltaTime, Window& winObj) {
 
         glm::vec3 right = glm::normalize(glm::cross(flatForward, glm::vec3(0.0f, 1.0f, 0.0f)));
 
-        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) input.moveDir += flatForward;
-        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) input.moveDir -= flatForward;
-        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) input.moveDir += right;
-        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) input.moveDir -= right;
-
         if (rb.isGrounded) {
             if (glm::length(input.moveDir) > 0.01f) {
                 glm::vec3 horizontalMove = glm::normalize(input.moveDir) * input.moveSpeed;
@@ -75,8 +70,30 @@ void InputSystem::Process(Scene& scene, float deltaTime, Window& winObj) {
                 rb.velocity.x = 0.0f;
                 rb.velocity.z = 0.0f;
             }
-        }            
+        }        
+        
+        // dont send key strokes. limit the freq of packets to hz of server.
 
-        if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && rb.isGrounded) rb.wantsToJump = true;
+        // if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+        //     input.moveDir += flatForward;
+        //     client.Send("W");
+        // }
+        // if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+        //     input.moveDir -= flatForward;
+        //     client.Send("S");
+        // }
+        // if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+        //     input.moveDir += right;
+        //     client.Send("D");
+        // }
+        // if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+        //     input.moveDir -= right;
+        //     client.Send("A");
+        // }
+
+        // if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && rb.isGrounded) {
+        //     rb.wantsToJump = true;
+        //     client.Send("Jump");
+        // }
     });
 }

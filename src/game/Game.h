@@ -10,13 +10,11 @@
 #include "input/InputSystem.h"
 #include "physics/RigidbodySystem.h"
 #include "physics/BoxColliderSystem.h"
+#include "network/MessageTypes.h"
 
 #include <thread>
 #include <network/Server.h>
 #include <network/Client.h>
-
-void startServer();
-void startClient();
 
 enum class GameState {
     MainMenu,
@@ -39,6 +37,7 @@ class Game {
         Window& window;
 
         Scene scene;
+        Client client;
         InputSystem inputs;
         RigidbodySystem rigidbodies;
         BoxColliderSystem colliders;
@@ -50,6 +49,9 @@ class Game {
         void RenderMainMenu();
         void RenderConnectionMenu();
         void RenderGameplay();
+
+        void startServer();
+        void startClient();
 };
 
 #endif

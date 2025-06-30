@@ -34,7 +34,7 @@ void Game::Init() {
 }
 
 void Game::LoadLevel(const std::string& levelName) {
-    std::cout << "Loading Level: " << levelName << std::endl;
+    std::cout << "[Client] Loading Level: " << levelName << std::endl;
     // Test Level
     scene.CreateEntity("Test_Level");
     // Cube
@@ -84,11 +84,11 @@ void Game::LoadLevel(const std::string& levelName) {
     glm::vec3 lightDir = glm::vec3(-0.0f, -1.0f, -0.75f);
     light.addComponent<LightComponent>(Light(lightColor, lightPos, lightType, lightDir));
 
-    std::cout << "Loaded Level: " << levelName << std::endl;
+    std::cout << "[Client] Loaded Level: " << levelName << std::endl;
 }
 
 void Game::AddPlayer(bool isClient) {
-    std::cout << "Adding Player " << isClient << std::endl;
+    std::cout << "[Client] Adding Player " << isClient << std::endl;
     
     auto player = scene.CreateEntity("Player");
     Camera camera(window.width, window.height, glm::vec3(0.0f, 1.75f, 0.0f));
@@ -313,6 +313,6 @@ void Game::startClient() {
     client.Send("Hello from client!", CHAT_MESSAGE);
 
     // request the scene from the server
-    std::cout << "Requesting scene from server.\n";
+    std::cout << "[Client] Requesting scene from server.\n";
     client.RequestScene();
 }

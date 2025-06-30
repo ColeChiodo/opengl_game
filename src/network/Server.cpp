@@ -2,7 +2,7 @@
 
 Server::Server(char* ipAddress, int port, Scene* sceneRef) : scene(sceneRef) {
     if (enet_initialize() != 0) {
-        std::cerr << "ENet initialization failed.\n";
+        std::cerr << "[Server] ENet initialization failed.\n";
         exit(EXIT_FAILURE);
     }
     atexit(enet_deinitialize);
@@ -18,11 +18,11 @@ Server::Server(char* ipAddress, int port, Scene* sceneRef) : scene(sceneRef) {
 
     server = enet_host_create(&address, 32, 2, 0, 0);
     if (!server) {
-        std::cerr << "Failed to create ENet server.\n";
+        std::cerr << "[Server] Failed to create ENet server.\n";
         exit(EXIT_FAILURE);
     }
 
-    std::cout << "Server started on port " << port << std::endl;
+    std::cout << "[Server] Server started on port " << port << std::endl;
 }
 
 Server::~Server() {
@@ -41,12 +41,12 @@ void Server::Run() {
 
             switch (event.type) {
                 case ENET_EVENT_TYPE_CONNECT:
-                    std::cout << "Client connected.\n";
+                    std::cout << "[Server] Client connected.\n";
                     break;
 
                 case ENET_EVENT_TYPE_RECEIVE:
                     receivedMsg = std::string(reinterpret_cast<char*>(event.packet->data));
-                    std::cout << "Packet received: " << receivedMsg << "\n";
+                    std::cout << "[Server] Packet received: " << receivedMsg << "\n";
                     
                     separator = receivedMsg.find('|');
                     if (separator != std::string::npos) {
@@ -54,12 +54,12 @@ void Server::Run() {
                         std::string payload = receivedMsg.substr(separator + 1);
 
                         if (type == REQUEST_SCENE) {
-                            std::cout << "Scene request received. Sending scene.\n";
+                            std::cout << "[Server] Scene request received. Sending scene.\n";
                             BroadcastScene(event.peer);
                         } else if (type == CHAT_MESSAGE) {
-                            std::cout << "Message from client: " << payload << std::endl;
+                            std::cout << "[Server] Message from client: " << payload << std::endl;
                         } else if (type == REQUEST_PLAYER_SPAWN) {
-                            std::cout << "Player spawn request received. Sending player spawn.\n";
+                            std::cout << "[Server] Player spawn request received. Sending player spawn.\n";
                             BroadcastPlayerSpawn(event.peer);
                         }
                     }
@@ -68,7 +68,7 @@ void Server::Run() {
                     break;
 
                 case ENET_EVENT_TYPE_DISCONNECT:
-                    std::cout << "Client disconnected.\n";
+                    std::cout << "[Server] Client disconnected.\n";
                     break;
 
                 default:

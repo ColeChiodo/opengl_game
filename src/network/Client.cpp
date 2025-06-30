@@ -2,14 +2,14 @@
 
 Client::Client() {
     if (enet_initialize() != 0) {
-        std::cerr << "ENet initialization failed.\n";
+        std::cerr << "[Client] ENet initialization failed.\n";
         exit(EXIT_FAILURE);
     }
     atexit(enet_deinitialize);
 
     client = enet_host_create(nullptr, 1, 2, 0, 0);
     if (!client) {
-        std::cerr << "Failed to create ENet client.\n";
+        std::cerr << "[Client] Failed to create ENet client.\n";
         exit(EXIT_FAILURE);
     }
 }
@@ -19,7 +19,7 @@ Client::~Client() {
 }
 
 void Client::Connect(const std::string& host, enet_uint16 port) {
-    std::cout << "Connecting to " << host << " on port " << port << std::endl;
+    std::cout << "[Client] Connecting to " << host << " on port " << port << std::endl;
 
     ENetAddress address;
     ENetEvent event;
@@ -29,14 +29,14 @@ void Client::Connect(const std::string& host, enet_uint16 port) {
 
     peer = enet_host_connect(client, &address, 2, 0);
     if (!peer) {
-        std::cerr << "No available peers for initiating connection.\n";
+        std::cerr << "[Client] No available peers for initiating connection.\n";
         exit(EXIT_FAILURE);
     }
 
     if (enet_host_service(client, &event, 5000) > 0 && event.type == ENET_EVENT_TYPE_CONNECT) {
-        std::cout << "Connected to server.\n";
+        std::cout << "[Client] Connected to server.\n";
     } else {
-        std::cerr << "Connection to server failed.\n";
+        std::cerr << "[Client] Connection to server failed.\n";
         enet_peer_reset(peer);
     }
 }
@@ -62,10 +62,10 @@ void Client::Poll() {
                 std::string payload = receivedMsg.substr(separator + 1);
 
                 if (type == SEND_SCENE) {
-                    std::cout << "Received Scene: " << payload << std::endl;
+                    std::cout << "[Client] Received Scene: " << payload << std::endl;
                     sceneReceivedCallback(payload);
                 } else if (type == SEND_PLAYER_SPAWN) {
-                    std::cout << "Received Player Spawn: " << payload << std::endl;
+                    std::cout << "[Client] Received Player Spawn: " << payload << std::endl;
                     spawnNewPlayerCallback(payload == "true");
                 }
             }

@@ -58,6 +58,9 @@ void Server::Run() {
                             BroadcastScene(event.peer);
                         } else if (type == CHAT_MESSAGE) {
                             std::cout << "Message from client: " << payload << std::endl;
+                        } else if (type == REQUEST_PLAYER_SPAWN) {
+                            std::cout << "Player spawn request received. Sending player spawn.\n";
+                            BroadcastPlayerSpawn(event.peer);
                         }
                     }
 
@@ -81,4 +84,24 @@ void Server::BroadcastScene(ENetPeer* peer) {
 
     ENetPacket* packet = enet_packet_create(packetData.c_str(), packetData.size() + 1, ENET_PACKET_FLAG_RELIABLE);
     enet_peer_send(peer, 0, packet);
+}
+
+void Server::BroadcastPlayerSpawn(ENetPeer* peer) {
+    // Send "true" to the requesting peer
+    std::string packetData = std::to_string(SEND_PLAYER_SPAWN) + "|true";
+    ENetPacket* packet = enet_packet_create(packetData.c_str(), packetData.size() + 1, ENET_PACKET_FLAG_RELIABLE);
+    enet_peer_send(peer, 0, packet);
+
+    // Send "false" to all other peers
+    packetData = std::to_string(SEND_PLAYER_SPAWN) + "|false";
+    
+    for (size_t i = 0; i < server->peerCount; ++i) {
+        ENetPeer* otherPeer = &server->peers[i];
+        
+        // Only send to connected peers that are not the requesting peer
+        if (otherPeer->state == ENET_PEER_STATE_CONNECTED && otherPeer != peer) {
+            ENetPacket* otherPacket = enet_packet_create(packetData.c_str(), packetData.size() + 1, ENET_PACKET_FLAG_RELIABLE);
+            enet_peer_send(otherPeer, 0, otherPacket);
+        }
+    }
 }

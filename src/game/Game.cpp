@@ -5,44 +5,38 @@ void newImGuiFrame();
 void drawImGui(Window& window);
 
 Game::Game(Renderer& renderer, Window& window)
-    : renderer(renderer), window(window) {}
+    : renderer(renderer), window(window) {
+    client.SetSceneReceivedCallback([this](const std::string& sceneData) {
+        // given scene data in format: levelName\nPlayer ID1\nPlayer ID2\n...
+        std::string levelName = sceneData.substr(0, sceneData.find("\n"));
+        this->LoadLevel(levelName);
+
+        std::string networkIDs = sceneData.substr(sceneData.find("\n") + 1);
+        std::stringstream ss(networkIDs);
+        std::string networkID;
+        while (std::getline(ss, networkID, '\n')) {
+            this->AddPlayer(false);
+        }
+
+        client.RequestPlayerSpawn();
+    });
+
+    client.SetSpawnNewPlayerCallback([this](const bool isClient) {
+        this->AddPlayer(isClient);
+    });
+}
 
 Game::~Game() {}
 
 void Game::Init() {
     // Initialize The Scene
+    LoadLevel("Test_Level");
+}
 
-    // Player
-    auto player = scene.CreateEntity("Player");
-    player.getComponent<TransformComponent>().translation = glm::vec3(0.0f, 0.0f, 0.0f);
-    Camera camera(window.width, window.height, glm::vec3(0.0f, 1.75f, 0.0f));
-    player.addComponent<CameraComponent>(camera, window);
-    player.getComponent<CameraComponent>().isPrimary = true;
-    player.addComponent<InputComponent>();
-    player.getComponent<InputComponent>().enabled = true;
-    // player.addComponent<ModelComponent>("models/makoto_p3/scene.gltf");
-    // player.getComponent<ModelComponent>().modelRotation = glm::vec3(90.0f, 0.0f, 0.0f);
-    // player.getComponent<ModelComponent>().modelPosition = glm::vec3(0.0f, -1.0f, 0.0f);
-    // player.getComponent<ModelComponent>().modelScale = glm::vec3(0.0175f);
-    player.addComponent<RigidbodyComponent>();
-    player.addComponent<BoxColliderComponent>();
-    player.getComponent<BoxColliderComponent>().size = glm::vec3(0.5f, 1.0f, 0.5f);
-
-    // Player 2
-    auto player2 = scene.CreateEntity("Player");
-    player2.getComponent<TransformComponent>().translation = glm::vec3(-2.0f, 0.0f, 5.0f);
-    player2.getComponent<TransformComponent>().rotation = glm::vec3(0.0f, 180.0f, 0.0f);
-    Camera camera2(window.width, window.height, glm::vec3(0.0f, 1.75f, 0.0f));
-    player2.addComponent<CameraComponent>(camera, window);
-    player2.addComponent<InputComponent>();
-    player2.addComponent<ModelComponent>("models/makoto_p3/scene.gltf");
-    player2.getComponent<ModelComponent>().modelRotation = glm::vec3(90.0f, 0.0f, 0.0f);
-    player2.getComponent<ModelComponent>().modelPosition = glm::vec3(0.0f, -1.0f, 0.0f);
-    player2.getComponent<ModelComponent>().modelScale = glm::vec3(0.0175f);
-    player2.addComponent<RigidbodyComponent>();
-    player2.addComponent<BoxColliderComponent>();
-    player2.getComponent<BoxColliderComponent>().size = glm::vec3(0.5f, 1.0f, 0.5f);
-
+void Game::LoadLevel(const std::string& levelName) {
+    std::cout << "Loading Level: " << levelName << std::endl;
+    // Test Level
+    scene.CreateEntity("Test_Level");
     // Cube
     auto cube = scene.CreateEntity("Cube");
     cube.getComponent<TransformComponent>().translation = glm::vec3(2.0f, 1.0f, 6.0f);
@@ -75,7 +69,6 @@ void Game::Init() {
     slope.getComponent<BoxColliderComponent>().isStatic = true;
     slope.getComponent<BoxColliderComponent>().size = glm::vec3(10.0f, 0.1f, 10.0f);
 
-
     // Sushi
     auto sushi = scene.CreateEntity("Sushi");
     sushi.getComponent<TransformComponent>().translation = glm::vec3(2.0f, 2.0f, 6.0f);
@@ -90,6 +83,37 @@ void Game::Init() {
     int lightType = 1;
     glm::vec3 lightDir = glm::vec3(-0.0f, -1.0f, -0.75f);
     light.addComponent<LightComponent>(Light(lightColor, lightPos, lightType, lightDir));
+
+    std::cout << "Loaded Level: " << levelName << std::endl;
+}
+
+void Game::AddPlayer(bool isClient) {
+    std::cout << "Adding Player " << isClient << std::endl;
+    
+    auto player = scene.CreateEntity("Player");
+    Camera camera(window.width, window.height, glm::vec3(0.0f, 1.75f, 0.0f));
+    player.addComponent<CameraComponent>(camera, window);
+    player.addComponent<InputComponent>();
+    player.addComponent<RigidbodyComponent>();
+    player.addComponent<BoxColliderComponent>();
+    player.getComponent<BoxColliderComponent>().size = glm::vec3(0.5f, 1.0f, 0.5f);
+    player.addComponent<NetworkedComponent>();
+
+    // if player is current client
+    if (isClient) {
+        player.getComponent<CameraComponent>().isPrimary = true;
+        player.getComponent<InputComponent>().enabled = true;
+    } else {
+        player.addComponent<ModelComponent>("models/makoto_p3/scene.gltf");
+
+        // Model adjustments for makoto_p3
+        player.getComponent<ModelComponent>().modelRotation = glm::vec3(90.0f, 0.0f, 0.0f);
+        player.getComponent<ModelComponent>().modelPosition = glm::vec3(0.0f, -1.0f, 0.0f);
+        player.getComponent<ModelComponent>().modelScale = glm::vec3(0.0175f);
+    }
+
+    // adjust spawn location
+    player.getComponent<TransformComponent>().translation = glm::vec3(0.0f, 0.0f, 0.0f);
 }
 
 void Game::Update(float deltaTime) {
@@ -246,7 +270,6 @@ void Game::RenderConnectionMenu() {
     ImGui::SetCursorPosX(buttonX);
     if (ImGui::Button("Client", buttonSize)) {
         startClient();
-        //Init();
         currentState = GameState::Playing;
     }
 
@@ -281,6 +304,8 @@ void Game::startServer() {
 
     // initialize the game. build the scene
     Init();
+
+    AddPlayer(true);
 }
 
 void Game::startClient() {
@@ -288,5 +313,6 @@ void Game::startClient() {
     client.Send("Hello from client!", CHAT_MESSAGE);
 
     // request the scene from the server
+    std::cout << "Requesting scene from server.\n";
     client.RequestScene();
 }

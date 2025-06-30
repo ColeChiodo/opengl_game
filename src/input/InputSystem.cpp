@@ -53,6 +53,7 @@ void InputSystem::Process(Scene& scene, float deltaTime, Window& winObj, Client&
         }
 
         // WASD Movement
+
         // TODO, edit the rigidbody by adding acceleration instead of directly changing the transform
         input.moveDir = glm::vec3(0.0f);
         glm::vec3 flatForward = camera.camera.GetForward();
@@ -60,6 +61,25 @@ void InputSystem::Process(Scene& scene, float deltaTime, Window& winObj, Client&
         flatForward = glm::normalize(flatForward);
 
         glm::vec3 right = glm::normalize(glm::cross(flatForward, glm::vec3(0.0f, 1.0f, 0.0f)));
+
+        // dont send key strokes. limit the freq of packets to hz of server.
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+            input.moveDir += flatForward;
+            //client.Send("W", CHAT_MESSAGE);
+        }
+        if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+            input.moveDir -= flatForward;
+        }
+        if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+            input.moveDir += right;
+        }
+        if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+            input.moveDir -= right;
+        }
+
+        if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && rb.isGrounded) {
+            rb.wantsToJump = true;
+        }
 
         if (rb.isGrounded) {
             if (glm::length(input.moveDir) > 0.01f) {
@@ -71,29 +91,5 @@ void InputSystem::Process(Scene& scene, float deltaTime, Window& winObj, Client&
                 rb.velocity.z = 0.0f;
             }
         }        
-        
-        // dont send key strokes. limit the freq of packets to hz of server.
-
-        // if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        //     input.moveDir += flatForward;
-        //     client.Send("W");
-        // }
-        // if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        //     input.moveDir -= flatForward;
-        //     client.Send("S");
-        // }
-        // if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
-        //     input.moveDir += right;
-        //     client.Send("D");
-        // }
-        // if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-        //     input.moveDir -= right;
-        //     client.Send("A");
-        // }
-
-        // if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && rb.isGrounded) {
-        //     rb.wantsToJump = true;
-        //     client.Send("Jump");
-        // }
     });
 }

@@ -29,6 +29,8 @@ class Game {
         ~Game();
 
         void Init();
+        void LoadLevel(const std::string& levelName);
+        void AddPlayer(bool isClient);
         void Update(float deltaTime);
         void Render();
 

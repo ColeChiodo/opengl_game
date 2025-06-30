@@ -19,6 +19,8 @@ Client::~Client() {
 }
 
 void Client::Connect(const std::string& host, enet_uint16 port) {
+    std::cout << "Connecting to " << host << " on port " << port << std::endl;
+
     ENetAddress address;
     ENetEvent event;
 
@@ -61,7 +63,10 @@ void Client::Poll() {
 
                 if (type == SEND_SCENE) {
                     std::cout << "Received Scene: " << payload << std::endl;
-                    // TODO: Deserialize and apply scene
+                    sceneReceivedCallback(payload);
+                } else if (type == SEND_PLAYER_SPAWN) {
+                    std::cout << "Received Player Spawn: " << payload << std::endl;
+                    spawnNewPlayerCallback(payload == "true");
                 }
             }
             enet_packet_destroy(event.packet);
@@ -71,4 +76,16 @@ void Client::Poll() {
 
 void Client::RequestScene() {
     Send("", REQUEST_SCENE);
+}
+
+void Client::RequestPlayerSpawn() {
+    Send("", REQUEST_PLAYER_SPAWN);
+}
+
+void Client::SetSceneReceivedCallback(std::function<void(const std::string&)> callback) {
+    sceneReceivedCallback = callback;
+}
+
+void Client::SetSpawnNewPlayerCallback(std::function<void(const bool isClient)> callback) {
+    spawnNewPlayerCallback = callback;
 }

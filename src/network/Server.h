@@ -12,6 +12,7 @@ class Server {
 
         void Run();
         void BroadcastScene(ENetPeer* peer);
+        void BroadcastPlayerSpawn(ENetPeer* peer);
 
     private:
         ENetHost* server = nullptr;

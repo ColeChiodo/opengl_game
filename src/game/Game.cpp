@@ -11,18 +11,22 @@ Game::Game(Renderer& renderer, Window& window)
         std::string levelName = sceneData.substr(0, sceneData.find("\n"));
         this->LoadLevel(levelName);
 
-        std::string networkIDs = sceneData.substr(sceneData.find("\n") + 1);
-        std::stringstream ss(networkIDs);
-        std::string networkID;
-        while (std::getline(ss, networkID, '\n')) {
-            this->AddPlayer(false);
+        std::string peerIDs = sceneData.substr(sceneData.find("\n") + 1);
+        std::stringstream ss(peerIDs);
+        std::string peerID;
+        // load players already in scene
+        while (std::getline(ss, peerID, '\n')) {
+            peerID = peerID.substr(7);
+            std::cout << "[Client] Loading Player with Peer ID: " << peerID << std::endl;
+            this->AddPlayer(false, std::stoi(peerID));
         }
 
+        // request new player spawn
         client.RequestPlayerSpawn();
     });
 
-    client.SetSpawnNewPlayerCallback([this](const bool isClient) {
-        this->AddPlayer(isClient);
+    client.SetSpawnNewPlayerCallback([this](const bool isClient, const int peerID) {
+        this->AddPlayer(isClient, peerID);
     });
 }
 
@@ -31,6 +35,7 @@ Game::~Game() {}
 void Game::Init() {
     // Initialize The Scene
     LoadLevel("Test_Level");
+    client.RequestPlayerSpawn();
 }
 
 void Game::LoadLevel(const std::string& levelName) {
@@ -87,8 +92,8 @@ void Game::LoadLevel(const std::string& levelName) {
     std::cout << "[Client] Loaded Level: " << levelName << std::endl;
 }
 
-void Game::AddPlayer(bool isClient) {
-    std::cout << "[Client] Adding Player " << isClient << std::endl;
+void Game::AddPlayer(bool isClient, int peerID) {
+    std::cout << "[Client] Adding Player " << isClient << " " << peerID << std::endl;
     
     auto player = scene.CreateEntity("Player");
     Camera camera(window.width, window.height, glm::vec3(0.0f, 1.75f, 0.0f));
@@ -98,6 +103,7 @@ void Game::AddPlayer(bool isClient) {
     player.addComponent<BoxColliderComponent>();
     player.getComponent<BoxColliderComponent>().size = glm::vec3(0.5f, 1.0f, 0.5f);
     player.addComponent<NetworkedComponent>();
+    player.getComponent<NetworkedComponent>().peerID = peerID;
 
     // if player is current client
     if (isClient) {
@@ -304,8 +310,6 @@ void Game::startServer() {
 
     // initialize the game. build the scene
     Init();
-
-    AddPlayer(true);
 }
 
 void Game::startClient() {

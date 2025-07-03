@@ -11,6 +11,16 @@ void InputSystem::Process(Scene& scene, float deltaTime, Window& winObj, Client&
     static double lastMouseX = winObj.width / 2.0;
     static double lastMouseY = winObj.height / 2.0;
 
+    // Accumulators for input averaging
+    static glm::vec3 accumulatedMoveDir(0.0f);
+    static float accumulatedYaw = 0.0f;
+    static float accumulatedPitch = 0.0f;
+    static int sampleCount = 0;
+    static bool jumpRequested = false;
+
+    static float sendTimer = 0.0f;
+    constexpr float sendInterval = 1.0f / 60.0f;
+
     view.each([&](auto entity, TransformComponent& transform, CameraComponent& camera, InputComponent& input, RigidbodyComponent& rb) {
         if (!input.enabled) return;
 
@@ -53,8 +63,6 @@ void InputSystem::Process(Scene& scene, float deltaTime, Window& winObj, Client&
         }
 
         // WASD Movement
-
-        // TODO, edit the rigidbody by adding acceleration instead of directly changing the transform
         input.moveDir = glm::vec3(0.0f);
         glm::vec3 flatForward = camera.camera.GetForward();
         flatForward.y = 0.0f;
@@ -62,10 +70,8 @@ void InputSystem::Process(Scene& scene, float deltaTime, Window& winObj, Client&
 
         glm::vec3 right = glm::normalize(glm::cross(flatForward, glm::vec3(0.0f, 1.0f, 0.0f)));
 
-        // dont send key strokes. limit the freq of packets to hz of server.
         if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
             input.moveDir += flatForward;
-            //client.Send("W", CHAT_MESSAGE);
         }
         if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
             input.moveDir -= flatForward;
@@ -77,10 +83,13 @@ void InputSystem::Process(Scene& scene, float deltaTime, Window& winObj, Client&
             input.moveDir -= right;
         }
 
+        // Jump flag
         if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && rb.isGrounded) {
             rb.wantsToJump = true;
+            jumpRequested = true;
         }
 
+        // Apply velocity locally (you might want to keep this for local prediction)
         if (rb.isGrounded) {
             if (glm::length(input.moveDir) > 0.01f) {
                 glm::vec3 horizontalMove = glm::normalize(input.moveDir) * input.moveSpeed;
@@ -90,6 +99,47 @@ void InputSystem::Process(Scene& scene, float deltaTime, Window& winObj, Client&
                 rb.velocity.x = 0.0f;
                 rb.velocity.z = 0.0f;
             }
-        }        
+        }
+
+        // Accumulate inputs for averaging
+        accumulatedMoveDir += input.moveDir;
+        accumulatedYaw += input.yaw;
+        accumulatedPitch += input.pitch;
+        sampleCount++;
     });
+
+    // Update the timer for sending inputs
+    sendTimer += deltaTime;
+    if (sendTimer >= sendInterval && sampleCount > 0) {
+        // Average the inputs
+        glm::vec3 avgMoveDir = accumulatedMoveDir / (float)sampleCount;
+        float avgYaw = accumulatedYaw / (float)sampleCount;
+        float avgPitch = accumulatedPitch / (float)sampleCount;
+
+        // Normalize avgMoveDir to avoid skew (if length is small, just zero)
+        if (glm::length(avgMoveDir) > 0.01f) {
+            avgMoveDir = glm::normalize(avgMoveDir);
+        } else {
+            avgMoveDir = glm::vec3(0.0f);
+        }
+
+        // Build a simple packet string or binary blob (example, adapt to your protocol)
+        // Example: "INPUT yaw pitch moveX moveY moveZ jump"
+        char packet[256];
+        int len = snprintf(packet, sizeof(packet), "INPUT %.2f %.2f %.2f %.2f %.2f %d",
+                           avgYaw, avgPitch,
+                           avgMoveDir.x, avgMoveDir.y, avgMoveDir.z,
+                           jumpRequested ? 1 : 0);
+
+        // Send to server/client
+        client.Send(std::string(packet, len), SEND_PLAYER_INPUT);
+
+        // Reset accumulators and timer
+        accumulatedMoveDir = glm::vec3(0.0f);
+        accumulatedYaw = 0.0f;
+        accumulatedPitch = 0.0f;
+        sampleCount = 0;
+        jumpRequested = false;
+        sendTimer = 0.0f;
+    }
 }

@@ -66,7 +66,22 @@ void Client::Poll() {
                     sceneReceivedCallback(payload);
                 } else if (type == SEND_PLAYER_SPAWN) {
                     std::cout << "[Client] Received Player Spawn: " << payload << std::endl;
-                    spawnNewPlayerCallback(payload == "true");
+
+                    size_t delimiterPos = payload.find('|');
+                    if (delimiterPos == std::string::npos) {
+                        std::cerr << "[Client] Invalid payload format: " << payload << std::endl;
+                        return;
+                    }
+
+                    std::string boolStr = payload.substr(0, delimiterPos);
+                    std::string intStr = payload.substr(delimiterPos + 1);
+
+                    bool isClient = (boolStr == "true");
+                    int peerID = std::stoi(intStr);
+
+                    if (spawnNewPlayerCallback) {
+                        spawnNewPlayerCallback(isClient, peerID);
+                    }
                 }
             }
             enet_packet_destroy(event.packet);
@@ -86,6 +101,6 @@ void Client::SetSceneReceivedCallback(std::function<void(const std::string&)> ca
     sceneReceivedCallback = callback;
 }
 
-void Client::SetSpawnNewPlayerCallback(std::function<void(const bool isClient)> callback) {
+void Client::SetSpawnNewPlayerCallback(std::function<void(const bool isClient, const int peerID)> callback) {
     spawnNewPlayerCallback = callback;
 }

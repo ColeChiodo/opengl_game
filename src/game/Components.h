@@ -22,7 +22,7 @@ struct IDComponent {
 };
 
 struct NetworkedComponent {
-    uint64_t networkID;
+    uint32_t peerID; // ENet peer's ID or a custom client ID
 
     NetworkedComponent() = default;
     NetworkedComponent(const NetworkedComponent&) = default;
@@ -137,6 +137,9 @@ struct InputComponent {
     float yaw = 0.0f;
     float moveSpeed = 8.0f;
     float sensitivity = 0.1f;
+
+    bool wantsToJump = false;
+    bool wantsToFire = false;
 };
 
 struct RigidbodyComponent {

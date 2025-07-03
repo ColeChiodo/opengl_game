@@ -4,6 +4,7 @@
 #include "Scene.h"
 #include "enet/enet.h"
 #include <iostream>
+#include <thread>
 
 class Server {
     public:
@@ -11,8 +12,12 @@ class Server {
         ~Server();
 
         void Run();
+        void HandleEvent(ENetEvent& event);
+        
         void BroadcastScene(ENetPeer* peer);
         void BroadcastPlayerSpawn(ENetPeer* peer);
+
+        int getPeerID(ENetPeer* peer);
 
     private:
         ENetHost* server = nullptr;

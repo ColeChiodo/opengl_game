@@ -18,6 +18,8 @@ class Scene {
         Entity CreateEntity(const std::string& name);
         void DestroyEntity(entt::entity entity);
 
+        void HandlePlayerInput(const int peerID, const std::string& input);
+
         std::string Serialize();
 
         entt::registry registry;

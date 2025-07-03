@@ -17,12 +17,12 @@ class Client {
         void RequestPlayerSpawn();
 
         void SetSceneReceivedCallback(std::function<void(const std::string&)> callback);
-        void SetSpawnNewPlayerCallback(std::function<void(const bool isClient)> callback);
+        void SetSpawnNewPlayerCallback(std::function<void(const bool isClient, const int peerID)> callback);
 
     private:
         ENetHost* client = nullptr;
         ENetPeer* peer = nullptr;
 
         std::function<void(const std::string&)> sceneReceivedCallback;
-        std::function<void(const bool isClient)> spawnNewPlayerCallback;
+        std::function<void(const bool isClient, const int peerID)> spawnNewPlayerCallback;
 };

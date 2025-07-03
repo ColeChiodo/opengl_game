@@ -4,7 +4,7 @@ This project will be a basic Multiplayer FPS game made in OpenGL and C++.
 
 ![sushi_bar example render](assets/readme/sushi_bar.png)
 ![ramlethal_weapons example render](assets/readme/ramlethal_weapons.png)
-![makoto_p3 example render](assets/readme/makoto_p3.gif)
+![multiplayer test example video](assets/readme/multiplayertest.gif)
 
 # How to Setup and Build the Project Yourself
 

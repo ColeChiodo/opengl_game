@@ -6,6 +6,20 @@ This project will be a basic Multiplayer FPS game made in OpenGL and C++.
 ![ramlethal_weapons example render](assets/readme/ramlethal_weapons.png)
 ![multiplayer test example video](assets/readme/multiplayertest.gif)
 
+# Used Libraries
+
+This project uses several open-source libraries to aid in rendering, networking, input handling, and game architecture:
+
+- **GLFW** – Window/context creation and input handling.
+- **GLEW** – OpenGL extension wrangler.
+- **OpenGL** – Core rendering API.
+- **enet** – Lightweight, low-level UDP networking library for fast and reliable multiplayer.
+- **entt** – Entity Component System (ECS) library used for game object management.
+- **glm** – OpenGL Mathematics library, used for matrix and vector math.
+- **imgui** – Immediate Mode GUI library, used for in-game debug tools and UI.
+- **nlohmann/json** – JSON parsing and serialization for configs and data.
+- **stb** (nothings/stb) – Single-file public domain libraries (e.g., `stb_image.h`) for loading images and other assets.
+
 # How to Setup and Build the Project Yourself
 
 ## Requirements

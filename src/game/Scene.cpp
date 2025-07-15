@@ -20,7 +20,7 @@ void Scene::DestroyEntity(entt::entity entity) {
 }
 
 void Scene::UpdatePlayerState(const int peerID, const std::string& input, const int localPeerID) {
-    // Format: "STATE posX posY posZ yaw pitch grounded jump"
+    // Format: "STATE, posX, posY, posZ, velX, velY, velZ, yaw, pitch"
     std::vector<std::string> tokens;
     std::stringstream ss(input);
     std::string token;
@@ -33,13 +33,19 @@ void Scene::UpdatePlayerState(const int peerID, const std::string& input, const 
         auto& networked = view.get<NetworkedComponent>(entity);
         if (networked.peerID == peerID && networked.peerID != localPeerID) {
             auto& transform = view.get<TransformComponent>(entity);
+            auto& rb = view.get<RigidbodyComponent>(entity);
             auto& input = view.get<InputComponent>(entity);
             transform.translation.x = std::stof(tokens[1]);
             transform.translation.y = std::stof(tokens[2]);
             transform.translation.z = std::stof(tokens[3]);
-            transform.rotation.y = std::stof(tokens[4]);
-            input.yaw = std::stof(tokens[4]);
-            input.pitch = std::stof(tokens[5]);
+            
+            rb.velocity.x = std::stof(tokens[4]);
+            rb.velocity.y = std::stof(tokens[5]);
+            rb.velocity.z = std::stof(tokens[6]);
+            
+            transform.rotation.y = std::stof(tokens[7]);
+            input.yaw = std::stof(tokens[7]);
+            input.pitch = std::stof(tokens[8]);
         }
     }
 }

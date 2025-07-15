@@ -154,22 +154,25 @@ int Server::getPeerID(ENetPeer* peer) {
 }
 
 void Server::BroadcastPlayerPositions() {
-    auto view = scene->registry.view<NetworkedComponent, InputComponent, TransformComponent>();
+    auto view = scene->registry.view<NetworkedComponent, InputComponent, TransformComponent, RigidbodyComponent>();
     for (auto entity : view) {
         auto& networked = view.get<NetworkedComponent>(entity);
         auto& input = view.get<InputComponent>(entity);
         auto& transform = view.get<TransformComponent>(entity);
+        auto& rb = view.get<RigidbodyComponent>(entity);
 
         std::string packetData = std::to_string(BROATCAST_PLAYER_STATE) + "|";
         packetData += std::to_string(networked.peerID) + "|";
+        // Format: "STATE, posX, posY, posZ, velX, velY, velZ, yaw, pitch"
         packetData += "STATE ";
         packetData += std::to_string(transform.translation.x) + " ";
         packetData += std::to_string(transform.translation.y) + " ";
         packetData += std::to_string(transform.translation.z) + " ";
+        packetData += std::to_string(rb.velocity.x) + " ";
+        packetData += std::to_string(rb.velocity.y) + " ";
+        packetData += std::to_string(rb.velocity.z) + " ";
         packetData += std::to_string(input.yaw) + " ";
         packetData += std::to_string(input.pitch) + " ";
-        packetData += std::to_string(0) + " ";
-        packetData += std::to_string(0);
 
         ENetPacket* packet = enet_packet_create(packetData.c_str(), packetData.size() + 1, ENET_PACKET_FLAG_RELIABLE);
         enet_host_broadcast(server, 0, packet);

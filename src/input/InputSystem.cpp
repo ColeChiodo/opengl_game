@@ -103,13 +103,12 @@ void InputSystem::Process(Scene& scene, float deltaTime, Window& winObj, Client&
             float yaw = input.yaw;
             float pitch = input.pitch;
 
-            // Format: "STATE posX posY posZ yaw pitch grounded jump"
+            // Format: "STATE, posX, posY, posZ, velX, velY, velZ, yaw, pitch"
             char packet[256];
-            int len = snprintf(packet, sizeof(packet), "STATE %.2f %.2f %.2f %.2f %.2f %d %d",
+            int len = snprintf(packet, sizeof(packet), "STATE %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f",
                                pos.x, pos.y, pos.z,
-                               yaw, pitch,
-                               rb.isGrounded ? 1 : 0,
-                               rb.wantsToJump ? 1 : 0);
+                               rb.velocity.x, rb.velocity.y, rb.velocity.z,
+                               yaw, pitch);
 
             client.Send(std::string(packet, len), SEND_PLAYER_STATE);
 

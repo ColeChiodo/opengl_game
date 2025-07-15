@@ -32,9 +32,6 @@ Server::~Server() {
 }
 
 void Server::Run() {
-    const int TICK_RATE = 60;
-    const int MS_PER_TICK = 1000 / TICK_RATE;
-
     ENetEvent event;
     auto nextTick = std::chrono::high_resolution_clock::now();
 
@@ -48,7 +45,7 @@ void Server::Run() {
         auto now = std::chrono::high_resolution_clock::now();
         if (now >= nextTick) {
             // Put update logic here
-            // UpdateGameState();
+            BroadcastPlayerPositions();
 
             nextTick += std::chrono::milliseconds(MS_PER_TICK);
         } else {
@@ -64,6 +61,7 @@ void Server::HandleEvent(ENetEvent& event) {
     switch (event.type) {
         case ENET_EVENT_TYPE_CONNECT:
             std::cout << "[Server] Client connected.\n";
+            BroadcastSetPlayerID(event.peer);
             break;
 
         case ENET_EVENT_TYPE_RECEIVE:
@@ -83,11 +81,10 @@ void Server::HandleEvent(ENetEvent& event) {
                 } else if (type == REQUEST_PLAYER_SPAWN) {
                     std::cout << "[Server] Player spawn request received. Sending player spawn.\n";
                     BroadcastPlayerSpawn(event.peer);
-                } else if (type == SEND_PLAYER_INPUT) {
-                    //std::cout << "[Server] Player input received: " << payload << std::endl;
-                    // get peer id from &server->peers. compare it to received peer id
+                } else if (type == SEND_PLAYER_STATE) {
+                    //std::cout << "[Server] Player state received: " << payload << std::endl;
                     int peerID = getPeerID(event.peer);
-                    scene->HandlePlayerInput(peerID, payload);
+                    scene->UpdatePlayerState(peerID, payload, 0);
                 }
             }
 
@@ -101,6 +98,12 @@ void Server::HandleEvent(ENetEvent& event) {
         default:
             break;
     }
+}
+
+void Server::BroadcastSetPlayerID(ENetPeer* peer) {
+    std::string packetData = std::to_string(SEND_PLAYER_ID) + "|" + std::to_string(getPeerID(peer));
+    ENetPacket* packet = enet_packet_create(packetData.c_str(), packetData.size() + 1, ENET_PACKET_FLAG_RELIABLE);
+    enet_peer_send(peer, 0, packet);
 }
 
 void Server::BroadcastScene(ENetPeer* peer) {
@@ -148,4 +151,27 @@ int Server::getPeerID(ENetPeer* peer) {
     }
 
     return peerID;
+}
+
+void Server::BroadcastPlayerPositions() {
+    auto view = scene->registry.view<NetworkedComponent, InputComponent, TransformComponent>();
+    for (auto entity : view) {
+        auto& networked = view.get<NetworkedComponent>(entity);
+        auto& input = view.get<InputComponent>(entity);
+        auto& transform = view.get<TransformComponent>(entity);
+
+        std::string packetData = std::to_string(BROATCAST_PLAYER_STATE) + "|";
+        packetData += std::to_string(networked.peerID) + "|";
+        packetData += "STATE ";
+        packetData += std::to_string(transform.translation.x) + " ";
+        packetData += std::to_string(transform.translation.y) + " ";
+        packetData += std::to_string(transform.translation.z) + " ";
+        packetData += std::to_string(input.yaw) + " ";
+        packetData += std::to_string(input.pitch) + " ";
+        packetData += std::to_string(0) + " ";
+        packetData += std::to_string(0);
+
+        ENetPacket* packet = enet_packet_create(packetData.c_str(), packetData.size() + 1, ENET_PACKET_FLAG_RELIABLE);
+        enet_host_broadcast(server, 0, packet);
+    }
 }

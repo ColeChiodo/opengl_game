@@ -82,6 +82,16 @@ void Client::Poll() {
                     if (spawnNewPlayerCallback) {
                         spawnNewPlayerCallback(isClient, peerID);
                     }
+                } else if (type == BROATCAST_PLAYER_STATE) {
+                    //std::cout << "[Client] Received Player State: " << payload << std::endl;
+                    int peerID = std::stoi(payload.substr(0, payload.find('|')));
+                    std::string input = payload.substr(payload.find('|') + 1);
+                    if (updatePlayerStateCallback) {
+                        updatePlayerStateCallback(peerID, payload);
+                    }
+                } else if (type == SEND_PLAYER_ID) {
+                    std::cout << "[Client] Received Player ID: " << payload << std::endl;
+                    setLocalPeerID(std::stoi(payload));
                 }
             }
             enet_packet_destroy(event.packet);
@@ -103,4 +113,8 @@ void Client::SetSceneReceivedCallback(std::function<void(const std::string&)> ca
 
 void Client::SetSpawnNewPlayerCallback(std::function<void(const bool isClient, const int peerID)> callback) {
     spawnNewPlayerCallback = callback;
+}
+
+void Client::SetUpdatePlayerStateCallback(std::function<void(const int peerID, const std::string& input)> callback) {
+    updatePlayerStateCallback = callback;
 }

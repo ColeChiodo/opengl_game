@@ -31,6 +31,7 @@ class Game {
         void Init();
         void LoadLevel(const std::string& levelName);
         void AddPlayer(bool isClient, int peerID = -1);
+        void UpdatePlayerState(int peerID, const std::string& input);
         void Update(float deltaTime);
         void Render();
 

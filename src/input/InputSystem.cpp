@@ -11,23 +11,20 @@ void InputSystem::Process(Scene& scene, float deltaTime, Window& winObj, Client&
     static double lastMouseX = winObj.width / 2.0;
     static double lastMouseY = winObj.height / 2.0;
 
-    // Accumulators for input averaging
-    static glm::vec3 accumulatedMoveDir(0.0f);
-    static float accumulatedYaw = 0.0f;
-    static float accumulatedPitch = 0.0f;
-    static int sampleCount = 0;
-    static bool jumpRequested = false;
-
     static float sendTimer = 0.0f;
     constexpr float sendInterval = 1.0f / 60.0f;
 
     view.each([&](auto entity, TransformComponent& transform, CameraComponent& camera, InputComponent& input, RigidbodyComponent& rb) {
         if (!input.enabled) return;
+        
+        static bool escPressedLastFrame = false;
+        bool escPressed = glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS;
 
-        input.lockMouse = true;
-        if (glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS) {
-            input.lockMouse = false;
+        if (escPressed && !escPressedLastFrame) {
+            input.lockMouse = !input.lockMouse;
         }
+
+        escPressedLastFrame = escPressed;
 
         if (input.lockMouse) {
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -86,10 +83,9 @@ void InputSystem::Process(Scene& scene, float deltaTime, Window& winObj, Client&
         // Jump flag
         if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && rb.isGrounded) {
             rb.wantsToJump = true;
-            jumpRequested = true;
         }
 
-        // Apply velocity locally (you might want to keep this for local prediction)
+        // Local velocity for prediction
         if (rb.isGrounded) {
             if (glm::length(input.moveDir) > 0.01f) {
                 glm::vec3 horizontalMove = glm::normalize(input.moveDir) * input.moveSpeed;
@@ -101,45 +97,24 @@ void InputSystem::Process(Scene& scene, float deltaTime, Window& winObj, Client&
             }
         }
 
-        // Accumulate inputs for averaging
-        accumulatedMoveDir += input.moveDir;
-        accumulatedYaw += input.yaw;
-        accumulatedPitch += input.pitch;
-        sampleCount++;
-    });
+        sendTimer += deltaTime;
+        if (sendTimer >= sendInterval) {
+            glm::vec3 pos = transform.translation;
+            float yaw = input.yaw;
+            float pitch = input.pitch;
 
-    // Update the timer for sending inputs
-    sendTimer += deltaTime;
-    if (sendTimer >= sendInterval && sampleCount > 0) {
-        // Average the inputs
-        glm::vec3 avgMoveDir = accumulatedMoveDir / (float)sampleCount;
-        float avgYaw = accumulatedYaw / (float)sampleCount;
-        float avgPitch = accumulatedPitch / (float)sampleCount;
+            // Format: "STATE posX posY posZ yaw pitch grounded jump"
+            char packet[256];
+            int len = snprintf(packet, sizeof(packet), "STATE %.2f %.2f %.2f %.2f %.2f %d %d",
+                               pos.x, pos.y, pos.z,
+                               yaw, pitch,
+                               rb.isGrounded ? 1 : 0,
+                               rb.wantsToJump ? 1 : 0);
 
-        // Normalize avgMoveDir to avoid skew (if length is small, just zero)
-        if (glm::length(avgMoveDir) > 0.01f) {
-            avgMoveDir = glm::normalize(avgMoveDir);
-        } else {
-            avgMoveDir = glm::vec3(0.0f);
+            client.Send(std::string(packet, len), SEND_PLAYER_STATE);
+
+            rb.wantsToJump = false; // reset jump flag
+            sendTimer = 0.0f;
         }
-
-        // Build a simple packet string or binary blob (example, adapt to your protocol)
-        // Example: "INPUT yaw pitch moveX moveY moveZ jump"
-        char packet[256];
-        int len = snprintf(packet, sizeof(packet), "INPUT %.2f %.2f %.2f %.2f %.2f %d",
-                           avgYaw, avgPitch,
-                           avgMoveDir.x, avgMoveDir.y, avgMoveDir.z,
-                           jumpRequested ? 1 : 0);
-
-        // Send to server/client
-        client.Send(std::string(packet, len), SEND_PLAYER_INPUT);
-
-        // Reset accumulators and timer
-        accumulatedMoveDir = glm::vec3(0.0f);
-        accumulatedYaw = 0.0f;
-        accumulatedPitch = 0.0f;
-        sampleCount = 0;
-        jumpRequested = false;
-        sendTimer = 0.0f;
-    }
+    });
 }

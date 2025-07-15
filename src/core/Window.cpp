@@ -82,8 +82,9 @@ bool Window::shouldClose() const {
 }
 
 void Window::processInput() {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    if (glfwGetKey(window, GLFW_KEY_LEFT_ALT) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_F4) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
+    }
 
     static bool f11PressedLastFrame = false;
     bool f11Pressed = glfwGetKey(window, GLFW_KEY_F11) == GLFW_PRESS;

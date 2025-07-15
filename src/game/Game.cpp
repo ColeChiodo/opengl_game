@@ -28,6 +28,10 @@ Game::Game(Renderer& renderer, Window& window)
     client.SetSpawnNewPlayerCallback([this](const bool isClient, const int peerID) {
         this->AddPlayer(isClient, peerID);
     });
+
+    client.SetUpdatePlayerStateCallback([this](const int peerID, const std::string& input) {
+        this->UpdatePlayerState(peerID, input);
+    });
 }
 
 Game::~Game() {}
@@ -120,6 +124,10 @@ void Game::AddPlayer(bool isClient, int peerID) {
 
     // adjust spawn location
     player.getComponent<TransformComponent>().translation = glm::vec3(0.0f, 0.0f, 0.0f);
+}
+
+void Game::UpdatePlayerState(int peerID, const std::string& input) {
+    scene.UpdatePlayerState(peerID, input, client.GetLocalPeerID());
 }
 
 void Game::Update(float deltaTime) {

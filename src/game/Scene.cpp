@@ -20,7 +20,7 @@ void Scene::DestroyEntity(entt::entity entity) {
 }
 
 void Scene::UpdatePlayerState(const int peerID, const std::string& input, const int localPeerID) {
-    // Format: "STATE, posX, posY, posZ, velX, velY, velZ, yaw, pitch"
+    // Format: "STATE posX posY posZ velX velY velZ yaw pitch"
     std::vector<std::string> tokens;
     std::stringstream ss(input);
     std::string token;
@@ -28,24 +28,49 @@ void Scene::UpdatePlayerState(const int peerID, const std::string& input, const 
         tokens.push_back(token);
     }
 
-    auto view = registry.view<NetworkedComponent, InputComponent, TransformComponent, CameraComponent, RigidbodyComponent>();
+    auto view = registry.view<NetworkedComponent, InputComponent, TransformComponent, CameraComponent, RigidbodyComponent, InterpolationComponent>();
     for (auto entity : view) {
         auto& networked = view.get<NetworkedComponent>(entity);
-        if (networked.peerID == peerID && networked.peerID != localPeerID) {
+        if (networked.peerID == peerID) {
+            glm::vec3 serverPos = {
+                std::stof(tokens[1]),
+                std::stof(tokens[2]),
+                std::stof(tokens[3])
+            };
+
+            glm::vec3 serverVel = {
+                std::stof(tokens[4]),
+                std::stof(tokens[5]),
+                std::stof(tokens[6])
+            };
+
+            float yaw = std::stof(tokens[7]);
+            float pitch = std::stof(tokens[8]);
+
             auto& transform = view.get<TransformComponent>(entity);
             auto& rb = view.get<RigidbodyComponent>(entity);
             auto& input = view.get<InputComponent>(entity);
-            transform.translation.x = std::stof(tokens[1]);
-            transform.translation.y = std::stof(tokens[2]);
-            transform.translation.z = std::stof(tokens[3]);
-            
-            rb.velocity.x = std::stof(tokens[4]);
-            rb.velocity.y = std::stof(tokens[5]);
-            rb.velocity.z = std::stof(tokens[6]);
-            
-            transform.rotation.y = std::stof(tokens[7]);
-            input.yaw = std::stof(tokens[7]);
-            input.pitch = std::stof(tokens[8]);
+            auto& camera = view.get<CameraComponent>(entity);
+            auto& interpolation = view.get<InterpolationComponent>(entity);
+
+            if (networked.peerID == localPeerID) {
+                // Local player
+                if (glm::length(transform.translation - serverPos) > 0.2f) {
+                    transform.translation = glm::mix(transform.translation, serverPos, 0.1f);
+                }
+            } else {
+                // Remote player
+                // transform.translation = serverPos;
+                // transform.rotation.y = yaw;
+                input.yaw = yaw;
+                input.pitch = pitch;
+                rb.velocity = serverVel;
+
+                interpolation.previousPos = transform.translation;
+                interpolation.previousRot.y = transform.rotation.y;
+                interpolation.targetPos = serverPos;
+                interpolation.targetRot.y = yaw;
+            }
         }
     }
 }

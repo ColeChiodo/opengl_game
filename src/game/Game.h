@@ -3,6 +3,7 @@
 
 #include "Scene.h"
 #include "Entity.h"
+#include "InterpolationSystem.h"
 #include "renderer/Renderer.h"
 #include "renderer/Camera.h"
 #include "renderer/Light.h"
@@ -44,6 +45,7 @@ class Game {
         InputSystem inputs;
         RigidbodySystem rigidbodies;
         BoxColliderSystem colliders;
+        InterpolationSystem interpolation;
 
         GameState currentState = GameState::MainMenu;
 

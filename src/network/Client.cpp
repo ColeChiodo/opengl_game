@@ -1,5 +1,8 @@
 #include "Client.h"
 
+#include <chrono>
+#include <thread>
+
 Client::Client() {
     if (enet_initialize() != 0) {
         std::cerr << "[Client] ENet initialization failed.\n";
@@ -42,12 +45,20 @@ void Client::Connect(const std::string& host, enet_uint16 port) {
 }
 
 void Client::Send(const std::string& msg, MessageType type) {
-    // Compose the message as: "type|payload"
-    std::string packetData = std::to_string(type) + "|" + msg;
+    // Simulate 100ms ± 30ms latency
+    int base_delay_ms = 100;
+    int jitter = rand() % 60 - 30;  // -30ms to +30ms
+    int total_delay = base_delay_ms + jitter;
 
-    ENetPacket* packet = enet_packet_create(packetData.c_str(), packetData.size() + 1, ENET_PACKET_FLAG_RELIABLE);
-    enet_peer_send(peer, 0, packet);
-    enet_host_flush(client);
+    std::thread([=]() {
+        //std::this_thread::sleep_for(std::chrono::milliseconds(total_delay)); // Comment this line to remove latency
+        
+        std::string packetData = std::to_string(type) + "|" + msg;
+
+        ENetPacket* packet = enet_packet_create(packetData.c_str(), packetData.size() + 1, ENET_PACKET_FLAG_RELIABLE);
+        enet_peer_send(peer, 0, packet);
+        enet_host_flush(client);
+    }).detach();
 }
 
 void Client::Poll() {

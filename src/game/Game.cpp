@@ -108,6 +108,8 @@ void Game::AddPlayer(bool isClient, int peerID) {
     player.getComponent<BoxColliderComponent>().size = glm::vec3(0.5f, 1.0f, 0.5f);
     player.addComponent<NetworkedComponent>();
     player.getComponent<NetworkedComponent>().peerID = peerID;
+    player.addComponent<InterpolationComponent>();
+    player.getComponent<InterpolationComponent>().previousPos = player.getComponent<TransformComponent>().translation;
 
     // if player is current client
     if (isClient) {
@@ -169,6 +171,9 @@ void Game::UpdateGameplay(float deltaTime) {
     // Process Physics
     rigidbodies.Process(scene, deltaTime);
     colliders.Process(scene, deltaTime);
+
+    // Process Interpolation
+    interpolation.Process(scene, deltaTime, client.GetLocalPeerID());
 
     // World Object Events
     float rotationSpeed = 30.0f; // degrees per second

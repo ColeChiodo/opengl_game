@@ -103,7 +103,7 @@ void InputSystem::Process(Scene& scene, float deltaTime, Window& winObj, Client&
             float yaw = input.yaw;
             float pitch = input.pitch;
 
-            // Format: "STATE, posX, posY, posZ, velX, velY, velZ, yaw, pitch"
+            // Format: "STATE posX posY posZ velX velY velZ yaw pitch"
             char packet[256];
             int len = snprintf(packet, sizeof(packet), "STATE %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f %.2f",
                                pos.x, pos.y, pos.z,
@@ -112,7 +112,7 @@ void InputSystem::Process(Scene& scene, float deltaTime, Window& winObj, Client&
 
             client.Send(std::string(packet, len), SEND_PLAYER_STATE);
 
-            rb.wantsToJump = false; // reset jump flag
+            rb.wantsToJump = false;
             sendTimer = 0.0f;
         }
     });

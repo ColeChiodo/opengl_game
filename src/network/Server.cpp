@@ -163,7 +163,7 @@ void Server::BroadcastPlayerPositions() {
 
         std::string packetData = std::to_string(BROATCAST_PLAYER_STATE) + "|";
         packetData += std::to_string(networked.peerID) + "|";
-        // Format: "STATE, posX, posY, posZ, velX, velY, velZ, yaw, pitch"
+        // Format: "STATE posX posY posZ velX velY velZ yaw pitch"
         packetData += "STATE ";
         packetData += std::to_string(transform.translation.x) + " ";
         packetData += std::to_string(transform.translation.y) + " ";

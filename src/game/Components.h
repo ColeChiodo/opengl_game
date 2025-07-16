@@ -28,6 +28,19 @@ struct NetworkedComponent {
     NetworkedComponent(const NetworkedComponent&) = default;
 };
 
+struct InterpolationComponent {
+    glm::vec3 previousPos;
+    glm::vec3 previousRot;
+
+    glm::vec3 targetPos;
+    glm::vec3 targetRot;
+
+    float elapsedTime = 0.0f;
+    float duration = 0.1f;
+
+    const int MS_PER_TICK = 1000 / 60;
+};
+
 struct TagComponent {
     std::string Tag;
 

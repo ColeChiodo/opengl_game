@@ -51,6 +51,41 @@ void BoxColliderSystem::Process(Scene& scene, float deltaTime) {
     }
 }
 
+void BoxColliderSystem::HitscanRaycast(Scene& scene, const int peerID, std::string input) {
+    // Format: "FIRE originX originY originZ directionX directionY directionZ"
+    std::vector<std::string> tokens;
+    std::stringstream ss(input);
+    std::string token;
+    while (std::getline(ss, token, ' ')) {
+        tokens.push_back(token);
+    }
+
+    glm::vec3 origin = {
+        std::stof(tokens[1]),
+        std::stof(tokens[2]),
+        std::stof(tokens[3])
+    };
+
+    glm::vec3 direction = {
+        std::stof(tokens[4]),
+        std::stof(tokens[5]),
+        std::stof(tokens[6])
+    };
+
+    auto view = scene.registry.view<TransformComponent, BoxColliderComponent, WeaponComponent, NetworkedComponent>();
+
+    view.each([&](auto entity, TransformComponent& transform, BoxColliderComponent& collider, WeaponComponent& weapon, NetworkedComponent& networked) {
+        if (networked.peerID == peerID) return;
+
+        OBB obb = CreateOBB(transform, collider);
+
+        float tHit;
+        if (RayIntersectsOBB(origin, direction, obb, tHit)) {
+            std::cout << peerID << " Hit " << networked.peerID << std::endl;
+        }
+    });
+}
+
 bool BoxColliderSystem::MasksOverlap(const std::unordered_set<int>& maskA, const std::unordered_set<int>& maskB) {
     for (int a : maskA) {
         if (maskB.count(a)) return true;

@@ -78,7 +78,7 @@ void Renderer::UpdateCameraMatrix(Scene& scene) {
 
     view.each([&](auto entity, TransformComponent& transform, CameraComponent& camComp) {
         if (camComp.isPrimary) {
-            camComp.camera.UpdateMatrix(90.0f, 0.1f, 1000.0f, transform.translation, transform.rotation);
+            camComp.camera.UpdateMatrix(0.1f, 1000.0f, transform.translation, transform.rotation);
         }
     });
 }

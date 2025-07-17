@@ -2,6 +2,8 @@
 #include <glm/glm.hpp>
 #include <algorithm>
 
+#include "Scene.h"
+
 void InterpolationSystem::Process(Scene& scene, float deltaTime, int localPeerID) {
     auto view = scene.registry.view<TransformComponent, InterpolationComponent, NetworkedComponent>();
 

@@ -105,11 +105,13 @@ void Game::AddPlayer(bool isClient, int peerID) {
     player.addComponent<InputComponent>();
     player.addComponent<RigidbodyComponent>();
     player.addComponent<BoxColliderComponent>();
-    player.getComponent<BoxColliderComponent>().size = glm::vec3(0.5f, 1.0f, 0.5f);
+    player.getComponent<BoxColliderComponent>().size = glm::vec3(0.5f, 1.25f, 0.5f);
+    player.getComponent<BoxColliderComponent>().offset = glm::vec3(0.0f, 0.25f, 0.0f);
     player.addComponent<NetworkedComponent>();
     player.getComponent<NetworkedComponent>().peerID = peerID;
     player.addComponent<InterpolationComponent>();
     player.getComponent<InterpolationComponent>().previousPos = player.getComponent<TransformComponent>().translation;
+    player.addComponent<WeaponComponent>();
 
     // if player is current client
     if (isClient) {
@@ -175,17 +177,7 @@ void Game::UpdateGameplay(float deltaTime) {
     // Process Interpolation
     interpolation.Process(scene, deltaTime, client.GetLocalPeerID());
 
-    // World Object Events
-    float rotationSpeed = 30.0f; // degrees per second
-
-    auto view = scene.registry.view<TransformComponent, TagComponent>();
-
-    view.each([&](auto entity, TransformComponent& transform, TagComponent& tag) {
-        if (tag.Tag == "Sushi") {
-            transform.rotation.y += rotationSpeed * deltaTime;
-        }
-    });
-
+    // Update lights
     renderer.SetLighting(scene);
 }
 
@@ -213,6 +205,9 @@ void Game::RenderGameplay() {
     draw_list->AddText(font, fontSize, ImVec2(framebufferWidth - 100, 0), color, "Top Right");
     draw_list->AddText(font, fontSize, ImVec2(0, framebufferHeight - 20), color, "Bottom Left");
     draw_list->AddText(font, fontSize, ImVec2(framebufferWidth - 130, framebufferHeight - 20), color, "Bottom Right");
+
+    // place a white circle at the center of the screen for a crosshair. have it be filled in.
+    draw_list->AddCircleFilled(ImVec2(framebufferWidth / 2, framebufferHeight / 2), 2.0f, IM_COL32(255, 255, 255, 100));
 }
 
 void Game::RenderMainMenu() {
@@ -310,7 +305,7 @@ void newImGuiFrame() {
 void Game::startServer() {
     // Start server in background
     std::thread([this]() {
-        Server host(nullptr, 23456, &scene);
+        Server host(nullptr, 23456, &scene, &colliders);
         host.Run();
     }).detach();
 

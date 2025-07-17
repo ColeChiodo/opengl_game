@@ -6,7 +6,7 @@
 
 void InputSystem::Process(Scene& scene, float deltaTime, Window& winObj, Client& client) {
     GLFWwindow* window = winObj.window;
-    auto view = scene.registry.view<TransformComponent, CameraComponent, InputComponent, RigidbodyComponent>();
+    auto view = scene.registry.view<TransformComponent, CameraComponent, InputComponent, RigidbodyComponent, WeaponComponent>();
 
     static double lastMouseX = winObj.width / 2.0;
     static double lastMouseY = winObj.height / 2.0;
@@ -14,7 +14,7 @@ void InputSystem::Process(Scene& scene, float deltaTime, Window& winObj, Client&
     static float sendTimer = 0.0f;
     constexpr float sendInterval = 1.0f / 60.0f;
 
-    view.each([&](auto entity, TransformComponent& transform, CameraComponent& camera, InputComponent& input, RigidbodyComponent& rb) {
+    view.each([&](auto entity, TransformComponent& transform, CameraComponent& camera, InputComponent& input, RigidbodyComponent& rb, WeaponComponent& weapon) {
         if (!input.enabled) return;
         
         static bool escPressedLastFrame = false;
@@ -54,6 +54,26 @@ void InputSystem::Process(Scene& scene, float deltaTime, Window& winObj, Client&
             glfwSetCursorPos(window, winObj.width / 2.0, winObj.height / 2.0);
             lastMouseX = winObj.width / 2.0;
             lastMouseY = winObj.height / 2.0;
+
+            if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS && weapon.canFire) {
+                // Shoot, send to server: "FIRE originX originY originZ directionX directionY directionZ"
+                weapon.canFire = false;
+                char packet[256];
+                int len = snprintf(packet, sizeof(packet), "FIRE %f %f %f %f %f %f",
+                                   transform.translation.x,
+                                   transform.translation.y + camera.camera.Position.y,
+                                   transform.translation.z,
+                                   camera.camera.Orientation.x,
+                                   camera.camera.Orientation.y,
+                                   camera.camera.Orientation.z);
+                client.Send(std::string(packet, len), FIRE_MESSAGE);
+            }
+
+            if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
+                camera.camera.isZoomed = true;
+            } else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_RELEASE) {
+                camera.camera.isZoomed = false;
+            }
 
         } else {
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
@@ -114,6 +134,15 @@ void InputSystem::Process(Scene& scene, float deltaTime, Window& winObj, Client&
 
             rb.wantsToJump = false;
             sendTimer = 0.0f;
+        }
+
+        if (!weapon.canFire) {
+            weapon.fireTimer += deltaTime;
+            if (weapon.fireTimer >= weapon.fireRate) {
+                weapon.canFire = true;
+                weapon.fireTimer = 0.0f;
+                //std::cout << "[Client] Can fire again.\n";
+            }
         }
     });
 }

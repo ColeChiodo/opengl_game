@@ -150,9 +150,13 @@ struct InputComponent {
     float yaw = 0.0f;
     float moveSpeed = 8.0f;
     float sensitivity = 0.1f;
+};
 
-    bool wantsToJump = false;
-    bool wantsToFire = false;
+struct WeaponComponent {
+    // store can fire bool, fire rate, and fire timer
+    bool canFire = true;
+    float fireRate = 0.1f;
+    float fireTimer = 0.0f;
 };
 
 struct RigidbodyComponent {

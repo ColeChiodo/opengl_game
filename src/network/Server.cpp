@@ -1,6 +1,6 @@
 #include "Server.h"
 
-Server::Server(char* ipAddress, int port, Scene* sceneRef) : scene(sceneRef) {
+Server::Server(char* ipAddress, int port, Scene* sceneRef, BoxColliderSystem* bcsRef) : scene(sceneRef), bcs(bcsRef) {
     if (enet_initialize() != 0) {
         std::cerr << "[Server] ENet initialization failed.\n";
         exit(EXIT_FAILURE);
@@ -85,6 +85,10 @@ void Server::HandleEvent(ENetEvent& event) {
                     //std::cout << "[Server] Player state received: " << payload << std::endl;
                     int peerID = getPeerID(event.peer);
                     scene->UpdatePlayerState(peerID, payload, 0);
+                } else if (type == FIRE_MESSAGE) {
+                    std::cout << "[Server] Fire message received: " << payload << std::endl;
+                    int peerID = getPeerID(event.peer);
+                    bcs->HitscanRaycast(*scene, peerID, payload);
                 }
             }
 

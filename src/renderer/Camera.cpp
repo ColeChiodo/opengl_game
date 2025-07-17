@@ -6,14 +6,15 @@ Camera::Camera(int width, int height, glm::vec3 position) {
 	Camera::Position = position;
 }
 
-void Camera::UpdateMatrix(float FOVdeg, float nearPlane, float farPlane, glm::vec3 worldPosition, glm::vec3 worldRotation) {
+void Camera::UpdateMatrix(float nearPlane, float farPlane, glm::vec3 worldPosition, glm::vec3 worldRotation) {
     glm::vec3 finalPosition = Position + worldPosition;
     glm::vec3 finalOrientation = Orientation + worldRotation;
 	glm::mat4 view = glm::mat4(1.0f);
 	glm::mat4 projection = glm::mat4(1.0f);
 
 	view = glm::lookAt(finalPosition, finalPosition + Orientation, Up);
-	projection = glm::perspective(glm::radians(FOVdeg), (float)width / height, nearPlane, farPlane);
+    float FOV = FOVdeg - (isZoomed ? 45.0f : 0.0f);
+	projection = glm::perspective(glm::radians(FOV), (float)width / height, nearPlane, farPlane);
 
     cameraMatrix = projection * view;
 }

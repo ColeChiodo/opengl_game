@@ -27,11 +27,15 @@ class Camera {
         const float fastSpeed = 0.15f;
         float currSpeed = defaultSpeed;
         float sensitivity = 0.1f;
+        float FOVdeg = 90.0f;
+        bool isZoomed = false;
 
         Camera(int width, int height, glm::vec3 position);
 
-        void UpdateMatrix(float FOVdeg, float nearPlane, float farPlane, glm::vec3 worldPosition, glm::vec3 worldRotation);
+        void UpdateMatrix(float nearPlane, float farPlane, glm::vec3 worldPosition, glm::vec3 worldRotation);
         void Matrix(Shader& shader, const char* uniform);
+
+        void setFOV(float fov) { FOVdeg = fov; }
 
         glm::vec3 GetForward() const;
 };

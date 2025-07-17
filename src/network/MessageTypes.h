@@ -8,5 +8,6 @@ enum MessageType {
     SEND_PLAYER_SPAWN = 5,
     SEND_PLAYER_STATE = 6,
     BROATCAST_PLAYER_STATE = 7,
-    SEND_PLAYER_ID = 8
+    SEND_PLAYER_ID = 8,
+    FIRE_MESSAGE = 9
 };

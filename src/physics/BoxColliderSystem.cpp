@@ -52,7 +52,7 @@ void BoxColliderSystem::Process(Scene& scene, float deltaTime) {
 }
 
 void BoxColliderSystem::HitscanRaycast(Scene& scene, const int peerID, std::string input) {
-    // Format: "FIRE originX originY originZ directionX directionY directionZ"
+    // Parse input: "FIRE originX originY originZ directionX directionY directionZ"
     std::vector<std::string> tokens;
     std::stringstream ss(input);
     std::string token;
@@ -66,24 +66,36 @@ void BoxColliderSystem::HitscanRaycast(Scene& scene, const int peerID, std::stri
         std::stof(tokens[3])
     };
 
-    glm::vec3 direction = {
+    glm::vec3 direction = glm::normalize(glm::vec3{
         std::stof(tokens[4]),
         std::stof(tokens[5]),
         std::stof(tokens[6])
-    };
+    });
 
-    auto view = scene.registry.view<TransformComponent, BoxColliderComponent, WeaponComponent, NetworkedComponent>();
+    std::vector<HitResult> hits;
 
-    view.each([&](auto entity, TransformComponent& transform, BoxColliderComponent& collider, WeaponComponent& weapon, NetworkedComponent& networked) {
-        if (networked.peerID == peerID) return;
+    auto view = scene.registry.view<TransformComponent, BoxColliderComponent, TagComponent>();
+    view.each([&](auto entity, TransformComponent& transform, BoxColliderComponent& collider, TagComponent& tag) {
+        if (auto* networked = scene.registry.try_get<NetworkedComponent>(entity)) {
+            if (networked->peerID == peerID) return;
+        }
 
         OBB obb = CreateOBB(transform, collider);
 
         float tHit;
         if (RayIntersectsOBB(origin, direction, obb, tHit)) {
-            std::cout << peerID << " Hit " << networked.peerID << std::endl;
+            hits.push_back({ entity, tag.Tag, tHit });
         }
     });
+
+    std::sort(hits.begin(), hits.end(), [](const HitResult& a, const HitResult& b) {
+        return a.tHit < b.tHit;
+    });
+
+    // Output sorted hits
+    for (const auto& hit : hits) {
+        std::cout << peerID << " Hit " << hit.tag << " at " << hit.tHit << std::endl;
+    }
 }
 
 bool BoxColliderSystem::MasksOverlap(const std::unordered_set<int>& maskA, const std::unordered_set<int>& maskB) {

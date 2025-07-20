@@ -106,3 +106,9 @@ inline bool RayIntersectsOBB(const glm::vec3& rayOrigin, const glm::vec3& rayDir
 
     return true;
 }
+
+struct HitResult {
+    entt::entity entity;
+    std::string tag;
+    float tHit;
+};

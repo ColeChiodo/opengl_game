@@ -6,9 +6,18 @@
 #include "renderer/Renderer.h"
 #include "renderer/Camera.h"
 
+#include <steam_api.h>
+
 const char* gameTitle = "Cole's Game";
 
 int main() {
+    if (!SteamAPI_Init()) {
+        std::cerr << "❌ SteamAPI_Init() failed! Is Steam running? Is steam_appid.txt in the right place?" << std::endl;
+        return 1;
+    }
+    const char* name = SteamFriends()->GetPersonaName();
+    std::cout << "✅ Steam initialized successfully!, logged in as: " << name << std::endl;
+
     Window appWindow(1280, 720, gameTitle);
 
     Renderer renderer;
@@ -62,6 +71,8 @@ int main() {
     }
 
     std::cout << "Thanks For Playing My Game\n:]\n";
+
+    SteamAPI_Shutdown();
 
     return 0;
 }

@@ -1,3 +1,7 @@
 /build/
 .vscode/
 .ccls-cache/
+*.dll
+*.lib
+*.so
+*.dylib

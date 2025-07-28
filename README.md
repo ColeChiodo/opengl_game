@@ -98,7 +98,12 @@ git clone https://github.com/ColeChiodo/opengl_game.git
 cd opengl_game
 ```
 
-### Step 2: Run the build script
+### Step 2: Create steam_appid.txt
+
+During development, create a ```steam_appid.txt``` file in the root directory containing the Steam App ID for local testing. \
+Valve provides appid ```480``` for testing purposes.
+
+### Step 3: Run the build script
 
 The project comes with a build.sh script that will handle the configuration and compilation of the project using CMake.
 
@@ -117,7 +122,7 @@ Now, run the script with the appropriate flags:
 Available flags:
 
 - `-w` : Builds for Windows.
-- `-l` : Builds for Ubuntu.
+- `-l` : Builds for Linux.
 - `-d` : Delete the contents of the build directory before building the project.
 - `-r` : Run the program after building it.
 
